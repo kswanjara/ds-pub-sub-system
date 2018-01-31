@@ -49,7 +49,7 @@ public class PubSubAgent {
 
 	public static void main(String[] args) {
 		loadProperties();
-
+		
 		System.out.println("What am I? \n1. Publisher 2. Subscriber");
 		Scanner sc = new Scanner(System.in);
 
