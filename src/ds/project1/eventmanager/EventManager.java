@@ -1,5 +1,8 @@
 package ds.project1.eventmanager;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 import ds.project1.commondtos.ConnectionDetails;
 import ds.project1.commondtos.Event;
 import ds.project1.commondtos.Topic;
@@ -9,6 +12,20 @@ public class EventManager implements CallBack {
 	@Override
 	public void newConnection(ConnectionDetails connectionDetails) {
 		System.out.println("Got new connection details!");
+		try {
+			// ObjectOutputStream outputStream = new
+			// ObjectOutputStream(connectionDetails.getSocket().getOutputStream());
+			ObjectInputStream inputStream = new ObjectInputStream(connectionDetails.getSocket().getInputStream());
+
+			String type = (String) inputStream.readObject();
+			System.out.println("Connection from :" + type);
+			connectionDetails.setType(type);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/*
@@ -56,8 +73,8 @@ public class EventManager implements CallBack {
 
 	public static void main(String[] args) {
 		new EventManager().startService();
-		while(true) {
-			
+		while (true) {
+
 		}
 	}
 
