@@ -6,8 +6,11 @@ import java.io.ObjectInputStream;
 import ds.project1.commondtos.ConnectionDetails;
 import ds.project1.commondtos.Event;
 import ds.project1.commondtos.Topic;
+import ds.project1.eventmanager.dto.DataManagerDto;
 
 public class EventManager implements CallBack {
+
+	private static DataManagerDto allData = new DataManagerDto();
 
 	@Override
 	public void newConnection(ConnectionDetails connectionDetails) {
@@ -76,6 +79,10 @@ public class EventManager implements CallBack {
 		while (true) {
 
 		}
+	}
+
+	public static DataManagerDto getAllData() {
+		return allData;
 	}
 
 }
