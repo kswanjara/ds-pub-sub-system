@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 
-import ds.project1.commondtos.Event;
-import ds.project1.commondtos.Topic;
+import ds.project1.commondtos.*;
+import ds.project1.eventmanager.dto.*;
 
 public class PubSubAgent {
 
@@ -61,6 +61,9 @@ public class PubSubAgent {
 		case 2:
 			connectToEventManager("Subscriber");
 			break;
+		case 3:
+			advertise_helper();
+			break;
 		default:
 			break;
 		}
@@ -68,10 +71,6 @@ public class PubSubAgent {
 	}
 
 	public void subscribe(Topic topic) {
-
-	}
-
-	public static void subscribe_helper(){
 
 	}
 
@@ -87,13 +86,15 @@ public class PubSubAgent {
 	public void listSubscribedTopics() {
 	}
 
-	public static void publish_helper(){
-
-	}
 	public void publish(Event event) {
 	}
 
 	public void advertise(Topic newTopic) {
+		loadProperties();
+		Packet packet_from_advertiser=new Packet(); //how to pass parameters here
+		packet_from_advertiser.setTopic(newTopic);
+		packet_from_advertiser.setType("advertiser");
+		connectToEventManager(packet_from_advertiser); // need to set connectiontoeventmanager to accept packet instead of string
 	}
 
 	public static void advertise_helper()
@@ -101,6 +102,7 @@ public class PubSubAgent {
 		String topic_name;
 		String keyword=null;
 		List<String> temp_list = null;
+		PubSubAgent pba = new PubSubAgent();
 		Scanner topic=new Scanner(System.in);
 		System.out.println("Enter the name of Topic");
 		topic_name=topic.next();
@@ -112,25 +114,6 @@ public class PubSubAgent {
 			temp_list.add(keyword);
 		}
 		T.setKeywords(temp_list);
-		advertise(T);
+		pba.advertise(T);
 	}
-
-	public static void main()
-	{
-		int choice;
-		Scanner sc= new Scanner(System.in);
-		System.out.println("Select the option");
-		System.out.println("1.Advertise");
-		System.out.println("2.Publish");
-		System.out.println("3.Subscribe");
-		choice = sc.nextInt();
-		switch (choice)
-		{
-			case 1: advertise_helper(); break;
-			case 2: subscribe_helper(); break;
-			case 3: publish_helper(); break;
-		}
-
-	}
-
 }
