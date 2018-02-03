@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Proxy;
 import java.net.Socket;
+import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -69,6 +70,10 @@ public class PubSubAgent {
 	public void subscribe(Topic topic) {
 	}
 
+	public static void subscribe_helper(){
+
+	}
+
 	public void subscribe(String keyword) {
 	}
 
@@ -81,10 +86,50 @@ public class PubSubAgent {
 	public void listSubscribedTopics() {
 	}
 
+	public static void publish_helper(){
+
+	}
 	public void publish(Event event) {
 	}
 
 	public void advertise(Topic newTopic) {
+	}
+
+	public static void advertise_helper()
+	{
+		String topic_name;
+		String keyword=null;
+		List<String> temp_list = null;
+		Scanner topic=new Scanner(System.in);
+		System.out.println("Enter the name of Topic");
+		topic_name=topic.next();
+		Topic T = new Topic();
+		T.setName(topic_name);
+		while (!(keyword.equals("done")))
+		{
+			System.out.println("Enter the related keywords");
+			temp_list.add(keyword);
+		}
+		T.setKeywords(temp_list);
+		advertise(T);
+	}
+
+	public static void main()
+	{
+		int choice;
+		Scanner sc= new Scanner(System.in);
+		System.out.println("Select the option");
+		System.out.println("1.Advertise");
+		System.out.println("2.Publish");
+		System.out.println("3.Subscribe");
+		choice = sc.nextInt();
+		switch (choice)
+		{
+			case 1: advertise_helper(); break;
+			case 2: subscribe_helper(); break;
+			case 3: publish_helper(); break;
+		}
+
 	}
 
 }
