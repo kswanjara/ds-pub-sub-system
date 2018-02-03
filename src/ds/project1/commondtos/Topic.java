@@ -50,4 +50,7 @@ public class Topic {
 		return "Topic [id=" + id + ", keywords=" + keywords + ", name=" + name + "]";
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
 }

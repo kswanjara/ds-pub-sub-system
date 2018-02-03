@@ -67,6 +67,7 @@ public class PubSubAgent {
 	}
 
 	public void subscribe(Topic topic) {
+
 	}
 
 	public void subscribe(String keyword) {

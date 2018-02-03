@@ -30,4 +30,11 @@ public class Event {
 		this.content = content;
 	}
 
+	public Topic getTopic() {
+		return topic;
+	}
+
+	public void setTopic(Topic topic) {
+		this.topic = topic;
+	}
 }
