@@ -1,3 +1,4 @@
+
 package ds.project1.eventmanager;
 
 import java.io.FileInputStream;
@@ -5,8 +6,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
-
-import ds.project1.commondtos.ConnectionDetails;
 
 public class ConnectionManager implements Runnable {
 
@@ -29,7 +28,8 @@ public class ConnectionManager implements Runnable {
 
 			while (true) {
 				socket = serverSocket.accept();
-				manager.newConnection(new ConnectionDetails(socket, "New Connection !"));
+				Thread t = new Thread(new EventManagerHelper(this.manager, socket));
+				t.start();
 			}
 
 		} catch (NumberFormatException | IOException e) {

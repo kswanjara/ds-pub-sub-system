@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import ds.project1.commondtos.ConnectionDetails;
@@ -58,14 +59,16 @@ public class EventManager implements CallBack {
 	 * add new topic when received advertisement of new topic
 	 */
 	private void addTopic(Topic topic) {
-
+		Map<Topic, List<SubscriberDto>> map = getAllData().getTopicDetails();
+		map.put(topic, new ArrayList<SubscriberDto>());
+		getAllData().setTopicDetails(map);
 	}
 
 	/*
 	 * add subscriber to the internal list
 	 */
 	private void addSubscriber(AbstractPubSubDto abstractPubSubDto) {
-
+		getAllData().getSubscriberList().add((SubscriberDto) abstractPubSubDto);
 	}
 
 	/*
@@ -94,7 +97,7 @@ public class EventManager implements CallBack {
 	}
 
 	private static void subscribeToTopic(AbstractPubSubDto abstractPubSubDto, Topic topic) {
-
+		// List<Sub>
 	}
 
 	private static Set<Topic> getAllTopics() {
@@ -129,7 +132,7 @@ public class EventManager implements CallBack {
 					// return the list of all topics
 					Set<Topic> set = getAllTopics();
 					List<Topic> list = new ArrayList<>(set);
-
+					packet.setTopicList(list);
 				}
 
 			}
