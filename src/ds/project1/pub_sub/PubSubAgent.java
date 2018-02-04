@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Proxy;
 import java.net.Socket;
-import java.util.List;
-import java.util.Properties;
-import java.util.Scanner;
+import java.util.*;
 
 import ds.project1.commondtos.*;
 import ds.project1.eventmanager.dto.*;
@@ -34,7 +32,7 @@ public class PubSubAgent {
 
 	private static void loadProperties() {
 		try {
-			String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+			String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
 			String appConfigPath = rootPath + "application.properties";
 
 			Properties appProps = new Properties();
