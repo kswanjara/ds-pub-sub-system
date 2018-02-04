@@ -273,11 +273,12 @@ public class PubSubAgent {
 		topic_name=topic.next();
 		Topic T = new Topic();
 		T.setName(topic_name);
-		while (!(Objects.equals(keyword, "done")))
-		{
-			System.out.println("Enter the related keywords");
-			temp_list.add(keyword);
-		}
+        System.out.println("Enter the related keywords");
+		do{
+		    keyword = topic.next();
+		    if(keyword.equals("done"))
+		        break;
+        } while(true);
 		T.setKeywords(temp_list);
 		pba.advertise(T);
 	}
