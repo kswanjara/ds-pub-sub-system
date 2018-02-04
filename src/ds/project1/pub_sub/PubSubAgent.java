@@ -1,8 +1,6 @@
 package ds.project1.pub_sub;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Proxy;
 import java.net.Socket;
 import java.util.*;
@@ -17,16 +15,25 @@ public class PubSubAgent {
 
 	private static Properties props;
 
-	public static void connectToEventManager(Packet packet) {
+	private static Packet connectToEventManager(Packet packet) {
 		try {
 			Socket socket = new Socket(props.getProperty("server.ip"),
 					Integer.parseInt(props.getProperty("server.port.number")));
 
-			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-			outputStream.writeObject(packet);
+			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+
+			try {
+				return (Packet) inputStream.readObject();
+			}
+			catch (IOException e) {
+				System.out.println(e);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 
 			socket.close();
-			outputStream.close();
+			inputStream.close();
+
 		} catch (NumberFormatException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -85,7 +92,7 @@ public class PubSubAgent {
 		subscriberDto.setOnline(true);
 		subscriberDto.setPort(8888);
 		Packet packet = new Packet(null, null, PacketConstants.SubscriberDto.toString(), subscriberDto);
-		connectToEventManager(packet);
+		Packet replyFromServer = connectToEventManager(packet);
 		System.out.println("Select 1 of these tasks that you want to do:");
 		System.out.println("Press 1 for subscribing to a topic using keywords \nPress 2 for subscribing directly to a topic using it's name \nPress 3 for unsubscribing from a topic \nPress 4 to show all th topics");
 		Scanner sc = new Scanner(System.in);
@@ -160,7 +167,7 @@ public class PubSubAgent {
 		topic_name=topic.next();
 		Topic T = new Topic();
 		T.setName(topic_name);
-		while (!(keyword.equals("done")))
+		while (!(Objects.equals(keyword, "done")))
 		{
 			System.out.println("Enter the related keywords");
 			temp_list.add(keyword);
