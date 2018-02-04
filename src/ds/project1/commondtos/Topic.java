@@ -7,7 +7,16 @@ public class Topic {
 	private List<String> keywords;
 	private String name;
 
-	public int getId() {
+	public Topic(int id, List<String> keywords){
+	    this.id = id;
+	    this.keywords = keywords;
+    }
+
+    public Topic() {
+
+    }
+
+    public int getId() {
 		return id;
 	}
 
@@ -17,10 +26,6 @@ public class Topic {
 
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public List<String> getKeywords() {
@@ -48,10 +53,8 @@ public class Topic {
 		if (getClass() != obj.getClass())
 			return false;
 		Topic other = (Topic) obj;
-		if (id != other.id)
-			return false;
-		return true;
-	}
+        return id == other.id;
+    }
 
 	@Override
 	public String toString() {

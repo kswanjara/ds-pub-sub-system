@@ -1,5 +1,6 @@
 package ds.project1.commondtos;
 
+import ds.project1.eventmanager.dto.AbstractPubSubDto;
 import ds.project1.eventmanager.dto.SubscriberDto;
 
 import java.io.Serializable;
@@ -8,14 +9,7 @@ public class Packet implements Serializable{
     private Topic topic;
     private Event event;
     private String type;
-    private SubscriberDto subscriberDto;
-
-    public Packet(Topic topic, Event event, String type, SubscriberDto subscriberDto) {
-        this.topic = topic;
-        this.event = event;
-        this.type = type;
-        this.subscriberDto = subscriberDto;
-    }
+    private AbstractPubSubDto abstractPubSubDto;
 
     public Topic getTopic() {
         return topic;
@@ -25,12 +19,12 @@ public class Packet implements Serializable{
         this.topic = topic;
     }
 
-    public SubscriberDto getSubscriberDto() {
-        return subscriberDto;
+    public Event getEvent() {
+        return event;
     }
 
-    public void setSubscriberDto(SubscriberDto subscriberDto) {
-        this.subscriberDto = subscriberDto;
+    public void setEvent(Event event) {
+        this.event = event;
     }
 
     public String getType() {
@@ -41,11 +35,11 @@ public class Packet implements Serializable{
         this.type = type;
     }
 
-    public Event getEvent() {
-        return event;
+    public AbstractPubSubDto getAbstractPubSubDto() {
+        return abstractPubSubDto;
     }
 
-    public void setEvent(Event event) {
-        this.event = event;
+    public void setAbstractPubSubDto(AbstractPubSubDto abstractPubSubDto) {
+        this.abstractPubSubDto = abstractPubSubDto;
     }
 }
