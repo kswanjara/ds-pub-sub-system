@@ -63,7 +63,7 @@ public class PubSubAgent {
 	public static void main(String[] args) {
 		loadProperties();
 		
-		System.out.println("What am I? \n1. Publisher 2. Subscriber");
+		System.out.println("What am I? \n1. Publisher 2. Subscriber 3. Advertise");
 		Scanner sc = new Scanner(System.in);
 
 		switch (sc.nextInt()) {
@@ -180,6 +180,7 @@ public class PubSubAgent {
 					System.out.println("Enter correct number again please:");
 					subscribe_helper();
 			}
+
 		}
 	}
 	public void subscribe(List<String> keyword) {
@@ -204,18 +205,59 @@ public class PubSubAgent {
 	public void listSubscribedTopics() {
 	}
 
-	public static void publish_helper(){
+	public static void publish_helper() {
+		PubSubAgent pubAgent = new PubSubAgent();
+		Event E = new Event();
+		Scanner pub_helper_sc= new Scanner(System.in);
+		Packet publisher_helper = new Packet();
 
+
+		publisher_helper.setType(PacketConstants.TopicList.toString());
+		Packet list_of_objects_of_topics = connectToEventManager(publisher_helper);
+		System.out.println("Enter the name of topic you want to publish under");
+		for(Topic item : list_of_objects_of_topics.getTopicList()){
+			System.out.println(item.getName());
+		}
+		String selected_topic = pub_helper_sc.next();
+		Topic object_of_selected_topic = null;
+		for(Topic item : list_of_objects_of_topics.getTopicList()) {
+			if (item.getName().equals(selected_topic))
+			{
+				object_of_selected_topic=item;
+			}
+		}
+		E.setTopic(object_of_selected_topic);
+
+		System.out.println("Enter the title of article");
+		E.setTitle(pub_helper_sc.next());
+
+		System.out.println("Enter the content you would like to publish");
+		E.setContent(pub_helper_sc.next());
+		pubAgent.publish(E);
 	}
+
 	public void publish(Event event) {
+		PublisherEventManager pem = new PublisherEventManager();
+		pem.startThread();
+		PublisherDto publisherDto = new PublisherDto();
+		Packet response_from_server_to_publisher=null;
+		Packet packet_from_publisher = new Packet();
+		packet_from_publisher.setTopic(event.getTopic());
+		packet_from_publisher.setEvent((event));
+		packet_from_publisher.setType(PacketConstants.PublisherDto.toString());
+		packet_from_publisher.setAbstractPubSubDto(publisherDto);
+		response_from_server_to_publisher = connectToEventManager((packet_from_publisher));
 	}
 
 	public void advertise(Topic newTopic) {
 		loadProperties();
+		PublisherDto publisherDto = new PublisherDto();
+		Packet response_from_server = null;
 		Packet packet_from_advertiser=new Packet(); //how to pass parameters here
 		packet_from_advertiser.setTopic(newTopic);
-		packet_from_advertiser.setType("advertiser");
-		connectToEventManager(packet_from_advertiser); // need to set connectiontoeventmanager to accept packet instead of string
+		packet_from_advertiser.setType(PacketConstants.Topic.toString());
+		packet_from_advertiser.setAbstractPubSubDto(publisherDto);
+		response_from_server = connectToEventManager(packet_from_advertiser); // need to set connectiontoeventmanager to accept packet instead of string
 	}
 
 	public static void advertise_helper()
