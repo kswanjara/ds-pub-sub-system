@@ -16,14 +16,15 @@ public class PubSubAgent {
 
 	private static Properties props;
 
-	public static void connectToEventManager(String type) {
+	public static void connectToEventManager(Packet packet) {
 		try {
 			Socket socket = new Socket(props.getProperty("server.ip"),
 					Integer.parseInt(props.getProperty("server.port.number")));
 
 			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-			outputStream.writeObject(type);
-
+			outputStream.writeObject(packet);
+			socket.close();
+			outputStream.close();
 		} catch (NumberFormatException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -54,10 +55,10 @@ public class PubSubAgent {
 
 		switch (sc.nextInt()) {
 		case 1:
-			connectToEventManager("Publisher");
+			//connectToEventManager("Publisher");
 			break;
 		case 2:
-			connectToEventManager("Subscriber");
+			//connectToEventManager("Subscriber");
 			PubSubAgent pubSubAgent = new PubSubAgent();
 			pubSubAgent.subscribe_helper();
 			break;
@@ -75,6 +76,14 @@ public class PubSubAgent {
 	}
 
 	public void subscribe_helper() {
+
+		SubscriberDto subscriberDto = new SubscriberDto();
+		subscriberDto.setGuid("1");
+		subscriberDto.setIp("192.168.sub.jeet");
+		subscriberDto.setOnline(true);
+		subscriberDto.setPort(8888);
+		Packet packet = new Packet(null, null,"subscriber", subscriberDto);
+		connectToEventManager(packet);
 		System.out.println("Select 1 of these tasks that you want to do:");
 		System.out.println("Press 1 for subscribing to a topic \nPress 2 for unsubscribing from a topic \nPress 3 to show all th topics");
 		Scanner sc = new Scanner(System.in);
