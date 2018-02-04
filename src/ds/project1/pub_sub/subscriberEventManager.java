@@ -1,0 +1,38 @@
+package ds.project1.pub_sub;
+
+import ds.project1.commondtos.ConnectionDetails;
+import ds.project1.eventmanager.CallBack;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
+public class subscriberEventManager implements CallBack{
+
+    public void newConnection(ConnectionDetails connectionDetails) {
+        System.out.println("Got new connection details!");
+        try {
+            // ObjectOutputStream outputStream = new
+            // ObjectOutputStream(connectionDetails.getSocket().getOutputStream());
+            ObjectInputStream inputStream = new ObjectInputStream(connectionDetails.getSocket().getInputStream());
+            System.out.println("Connection from Event Manager");
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void startService() {
+        Thread connectionThread = new Thread(new PublisherConnectionManager(new PublisherEventManager()));
+        connectionThread.start();
+    }
+
+    public void startThread()
+    {
+        new subscriberEventManager().startService();
+        while(true)
+        {
+
+        }
+    }
+}

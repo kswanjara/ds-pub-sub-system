@@ -175,7 +175,7 @@ public class PubSubAgent {
 						System.out.println(topic.getName());
 					}
 				case 5:
-
+				    unsubscribe();
 				default:
 					System.out.println("Enter correct number again please:");
 					subscribe_helper();
@@ -200,6 +200,8 @@ public class PubSubAgent {
 	}
 
 	public void unsubscribe() {
+        Packet unsubscribeAllTopics = new Packet(null, null, PacketConstants.UnsubscribeAll.toString(), subscriberDto);
+        connectToEventManager(unsubscribeAllTopics);
 	}
 
 	public void listSubscribedTopics() {
