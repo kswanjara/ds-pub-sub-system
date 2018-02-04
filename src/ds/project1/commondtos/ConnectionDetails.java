@@ -1,8 +1,11 @@
 package ds.project1.commondtos;
 
+import java.io.Serializable;
 import java.net.Socket;
 
-public class ConnectionDetails {
+public class ConnectionDetails implements Serializable {
+	private static final long serialVersionUID = 5587587988116112693L;
+
 	public ConnectionDetails(Socket socket, String type) {
 		this.socket = socket;
 		this.type = type;

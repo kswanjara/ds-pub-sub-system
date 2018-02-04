@@ -3,23 +3,24 @@ package ds.project1.commondtos;
 import java.io.Serializable;
 import java.util.List;
 
-public class Topic implements Serializable{
+public class Topic implements Serializable {
+	private static final long serialVersionUID = 1545135876274538840L;
 
 	private int id;
 	private List<String> keywords;
 	private String name;
 
-	public Topic(int id, List<String> keywords, String name){
-	    this.id = id;
-	    this.keywords = keywords;
-	    this.name = name;
-    }
+	public Topic(int id, List<String> keywords, String name) {
+		this.id = id;
+		this.keywords = keywords;
+		this.name = name;
+	}
 
-    public Topic() {
+	public Topic() {
 
-    }
+	}
 
-    public int getId() {
+	public int getId() {
 		return id;
 	}
 
@@ -56,8 +57,8 @@ public class Topic implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		Topic other = (Topic) obj;
-        return id == other.id;
-    }
+		return id == other.id;
+	}
 
 	@Override
 	public String toString() {

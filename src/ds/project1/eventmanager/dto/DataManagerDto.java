@@ -1,5 +1,6 @@
 package ds.project1.eventmanager.dto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,7 +8,8 @@ import java.util.Map;
 
 import ds.project1.commondtos.Topic;
 
-public class DataManagerDto {
+public class DataManagerDto implements Serializable {
+	private static final long serialVersionUID = 6066828238461586412L;
 
 	private Map<Topic, List<SubscriberDto>> topicDetails = new HashMap<Topic, List<SubscriberDto>>();
 	private List<SubscriberDto> subscriberList = new ArrayList<SubscriberDto>();

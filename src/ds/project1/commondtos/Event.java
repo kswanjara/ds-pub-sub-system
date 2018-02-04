@@ -2,7 +2,9 @@ package ds.project1.commondtos;
 
 import java.io.Serializable;
 
-public class Event implements Serializable{
+public class Event implements Serializable {
+	private static final long serialVersionUID = -2896628416781183580L;
+
 	private int id;
 	private Topic topic;
 	private String title;
