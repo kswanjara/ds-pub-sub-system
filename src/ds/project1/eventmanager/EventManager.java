@@ -2,11 +2,21 @@ package ds.project1.eventmanager;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import ds.project1.commondtos.ConnectionDetails;
 import ds.project1.commondtos.Event;
+import ds.project1.commondtos.Packet;
 import ds.project1.commondtos.Topic;
+import ds.project1.ds.project1.common.enums.PacketConstants;
+import ds.project1.eventmanager.dto.AbstractPubSubDto;
 import ds.project1.eventmanager.dto.DataManagerDto;
+import ds.project1.eventmanager.dto.PublisherDto;
+import ds.project1.eventmanager.dto.SubscriberDto;
 
 public class EventManager implements CallBack {
 
@@ -54,7 +64,7 @@ public class EventManager implements CallBack {
 	/*
 	 * add subscriber to the internal list
 	 */
-	private void addSubscriber() {
+	private void addSubscriber(AbstractPubSubDto abstractPubSubDto) {
 
 	}
 
@@ -79,8 +89,57 @@ public class EventManager implements CallBack {
 		}
 	}
 
-	public static DataManagerDto getAllData() {
+	private static DataManagerDto getAllData() {
 		return allData;
+	}
+
+	private static void subscribeToTopic(AbstractPubSubDto abstractPubSubDto, Topic topic) {
+
+	}
+
+	private static Set<Topic> getAllTopics() {
+		return getAllData().getTopicDetails().keySet();
+	}
+
+	@Override
+	public Packet handlePacket(Packet packet) {
+		if (packet != null) {
+			if (packet.getType() != null && !packet.getType().trim().equals("")) {
+				if (packet.getType().trim().equals(PacketConstants.Topic.toString())) {
+					// check what is the type of object in abstractPubSubDto
+					if (packet.getAbstractPubSubDto() != null
+							&& packet.getAbstractPubSubDto() instanceof PublisherDto) {
+						// if Pub - advertise
+						addTopic(packet.getTopic());
+					} else if (packet.getAbstractPubSubDto() != null
+							&& packet.getAbstractPubSubDto() instanceof SubscriberDto) {
+						// if Sub - subscribe
+						subscribeToTopic(packet.getAbstractPubSubDto(), packet.getTopic());
+					}
+				} else if (packet.getType().trim().equals(PacketConstants.Event.toString())) {
+					// Event published - Notify subscriber
+					notifySubscribers(packet.getEvent());
+				} else if (packet.getType().trim().equals(PacketConstants.PublisherDto.toString())) {
+					// Publisher notifying about the status
+					addPublisher(packet.getAbstractPubSubDto());
+				} else if (packet.getType().trim().equals(PacketConstants.SubscriberDto.toString())) {
+					// Subscriber notifying about the status
+					addSubscriber(packet.getAbstractPubSubDto());
+				} else if (packet.getType().trim().equals(PacketConstants.TopicList.toString())) {
+					// return the list of all topics
+					Set<Topic> set = getAllTopics();
+					List<Topic> list = new ArrayList<>(set);
+
+				}
+
+			}
+		}
+		return packet;
+	}
+
+	private void addPublisher(AbstractPubSubDto abstractPubSubDto) {
+		// TODO Auto-generated method stub
+
 	}
 
 }
