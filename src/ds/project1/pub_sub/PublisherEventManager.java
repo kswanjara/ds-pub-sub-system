@@ -1,10 +1,9 @@
 package ds.project1.pub_sub;
 
-import ds.project1.commondtos.ConnectionDetails;
-import ds.project1.eventmanager.CallBack;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
+
+import ds.project1.commondtos.ConnectionDetails;
 
 public class PublisherEventManager implements CallBack{
 
