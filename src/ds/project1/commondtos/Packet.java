@@ -11,6 +11,9 @@ public class Packet implements Serializable{
     private String type;
     private AbstractPubSubDto abstractPubSubDto;
 
+    public Packet(){
+    }
+
     public Topic getTopic() {
         return topic;
     }
