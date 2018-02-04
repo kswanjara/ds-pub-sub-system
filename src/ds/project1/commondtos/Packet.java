@@ -12,6 +12,14 @@ public class Packet implements Serializable{
     private AbstractPubSubDto abstractPubSubDto;
 
     public Packet(){
+
+    }
+
+    public Packet(Topic topic, Event event, String type, SubscriberDto subscriberDto) {
+        this.event = event;
+        this.topic = topic;
+        this.type = type;
+        this.abstractPubSubDto = subscriberDto;
     }
 
     public Topic getTopic() {

@@ -7,9 +7,10 @@ public class Topic {
 	private List<String> keywords;
 	private String name;
 
-	public Topic(int id, List<String> keywords){
+	public Topic(int id, List<String> keywords, String name){
 	    this.id = id;
 	    this.keywords = keywords;
+	    this.name = name;
     }
 
     public Topic() {

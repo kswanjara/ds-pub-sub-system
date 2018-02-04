@@ -24,9 +24,7 @@ public class EventManager implements CallBack {
 			System.out.println("Connection from :" + type);
 			connectionDetails.setType(type);
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}

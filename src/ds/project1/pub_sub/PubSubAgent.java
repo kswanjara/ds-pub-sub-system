@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.*;
 
 import ds.project1.commondtos.*;
+import ds.project1.ds.project1.common.enums.PacketConstants;
 import ds.project1.eventmanager.dto.*;
 
 public class PubSubAgent {
@@ -23,6 +24,7 @@ public class PubSubAgent {
 
 			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
 			outputStream.writeObject(packet);
+
 			socket.close();
 			outputStream.close();
 		} catch (NumberFormatException | IOException e) {
@@ -82,15 +84,15 @@ public class PubSubAgent {
 		subscriberDto.setIp("192.168.sub.jeet");
 		subscriberDto.setOnline(true);
 		subscriberDto.setPort(8888);
-		Packet packet = new Packet(null, null,"subscriber", subscriberDto);
+		Packet packet = new Packet(null, null, PacketConstants.SubscriberDto.toString(), subscriberDto);
 		connectToEventManager(packet);
 		System.out.println("Select 1 of these tasks that you want to do:");
-		System.out.println("Press 1 for subscribing to a topic \nPress 2 for unsubscribing from a topic \nPress 3 to show all th topics");
+		System.out.println("Press 1 for subscribing to a topic using keywords \nPress 2 for subscribing directly to a topic using it's name \nPress 3 for unsubscribing from a topic \nPress 4 to show all th topics");
 		Scanner sc = new Scanner(System.in);
 		while(sc.hasNextInt()) {
 			switch (sc.nextInt()){
 				case 1:
-					System.out.println("Enter the keywords for the topic that you are interested in in one line separated with a comma:");
+					System.out.println("Enter the keywords for the topic that you are interested in a single line separated with a comma:");
 					String keywords = null;
 					while (sc.hasNext()){
 						keywords = sc.nextLine();
@@ -115,14 +117,16 @@ public class PubSubAgent {
 		}
 	}
 	public void subscribe(List<String> keyword) {
-		Topic topic = new Topic(2, keyword);
+		Topic topic = new Topic(2, keyword, null);
+		Packet packet = new Packet(topic, null, PacketConstants.TopicList.toString(), null);
+		connectToEventManager(packet);
+
 		//return topic names from event manager
 		//select the topic name from the given topics
-
-
 	}
 
 	public void unsubscribe(Topic topic) {
+
 	}
 
 	public void unsubscribe() {
