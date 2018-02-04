@@ -1,8 +1,11 @@
 package ds.project1.commondtos;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Topic {
+public class Topic implements Serializable{
+
+
 	private int id;
 	private List<String> keywords;
 	private String name;

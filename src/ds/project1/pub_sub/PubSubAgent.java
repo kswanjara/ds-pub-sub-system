@@ -1,16 +1,19 @@
 package ds.project1.pub_sub;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Proxy;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import ds.project1.commondtos.*;
 import ds.project1.ds.project1.common.enums.PacketConstants;
 import ds.project1.eventmanager.dto.*;
 
 public class PubSubAgent {
-
+	private static SubscriberDto subscriberDto;
 	private static Socket socket;
 
 	private static Properties props;
@@ -70,6 +73,13 @@ public class PubSubAgent {
 		case 2:
 			//connectToEventManager("Subscriber");
 			PubSubAgent pubSubAgent = new PubSubAgent();
+			try {
+				loadSubscriberDto();
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			}
+			Packet packet = new Packet(null, null, PacketConstants.SubscriberDto.toString(), subscriberDto);
+			Packet replyFromServer = connectToEventManager(packet);
 			pubSubAgent.subscribe_helper();
 			break;
 		case 3:
@@ -81,19 +91,20 @@ public class PubSubAgent {
 
 	}
 
-	public void subscribe(Topic topic) {
+	private static void loadSubscriberDto() throws UnknownHostException {
+		subscriberDto = new SubscriberDto();
+		subscriberDto.setPort(8888);
+		subscriberDto.setOnline(true);
+		subscriberDto.setGuid("DNS");
+		subscriberDto.setIp(InetAddress.getLocalHost());
+	}
 
+	public void subscribe(Topic topic) {
+		Packet packet = new Packet(topic, null, PacketConstants.TopicList.toString(), subscriberDto);
+		Packet replyFromServer = connectToEventManager(packet);
 	}
 
 	public void subscribe_helper() {
-
-		SubscriberDto subscriberDto = new SubscriberDto();
-		subscriberDto.setGuid("1");
-		subscriberDto.setIp("192.168.sub.jeet");
-		subscriberDto.setOnline(true);
-		subscriberDto.setPort(8888);
-		Packet packet = new Packet(null, null, PacketConstants.SubscriberDto.toString(), subscriberDto);
-		Packet replyFromServer = connectToEventManager(packet);
 		System.out.println("Select 1 of these tasks that you want to do:");
 		System.out.println("Press 1 for subscribing to a topic using keywords \nPress 2 for subscribing directly to a topic using it's name \nPress 3 for unsubscribing from a topic \nPress 4 to show all th topics");
 		Scanner sc = new Scanner(System.in);
@@ -108,27 +119,45 @@ public class PubSubAgent {
 					assert keywords != null;
 					List<String> items = Arrays.asList(keywords.split("\\s*,\\s*"));
 					subscribe(items);
-					/*int id = 1;
-					System.out.println("Please enter the topic name:");
-					String topic_name = sc.next();
-					Topic topic = new Topic(id, topic_name);*/
-
 
 				case 2:
+					Packet newPacket = new Packet(null, null, PacketConstants.TopicList.toString(), null);
+					Packet recievedPacket =  connectToEventManager(newPacket);
+					List<Topic> topicList = recievedPacket.getTopicList();
+
+					System.out.println("These are the topics available for you to subscribe :\n");
+					for(Topic topic : topicList){
+						System.out.println(topic.getName());
+					}
+					System.out.println("Enter the topic name you want to subscribe to:");
+					String input_topic = sc.next();
+					List<Topic> temp_list =  topicList.stream().filter(p -> p.getName().equals(input_topic)).collect(Collectors.toList());
+					if(temp_list.size() > 0 )
+					{
+					 	Topic topicSelected = temp_list.get(0);
+						subscribe(topicSelected);
+					}else{
+						System.out.println("Incorrect topic name. Please Try again...");
+						subscribe_helper();
+					}
 
 				case 3:
 
+				case 4:
+
 				default:
 					System.out.println("Enter correct number again please:");
+					subscribe_helper();
 			}
 
 		}
 	}
 	public void subscribe(List<String> keyword) {
-		Topic topic = new Topic(2, keyword, null);
-		Packet packet = new Packet(topic, null, PacketConstants.TopicList.toString(), null);
-		connectToEventManager(packet);
+		Packet packet = new Packet(null, null, PacketConstants.TopicList.toString(), null);
+		Packet recievedPacket =  connectToEventManager(packet);
+		List<Topic> topicList = recievedPacket.getTopicList();
 
+		//Write code to filter the results using keywords
 		//return topic names from event manager
 		//select the topic name from the given topics
 	}

@@ -1,6 +1,8 @@
 package ds.project1.commondtos;
 
-public class Event {
+import java.io.Serializable;
+
+public class Event implements Serializable{
 	private int id;
 	private Topic topic;
 	private String title;

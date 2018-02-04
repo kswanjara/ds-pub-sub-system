@@ -11,16 +11,16 @@ public class Packet implements Serializable{
     private Event event;
     private String type;
     private AbstractPubSubDto abstractPubSubDto;
+    private List<Topic> TopicList;
 
-    public List<String> getTopicList() {
+
+    public List<Topic> getTopicList() {
         return TopicList;
     }
 
-    public void setTopicList(List<String> topicList) {
+    public void setTopicList(List<Topic> topicList) {
         TopicList = topicList;
     }
-
-    private List<String> TopicList;
 
     public Packet(){
 

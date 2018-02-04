@@ -1,12 +1,13 @@
 package ds.project1.eventmanager.dto;
 
 import java.io.Serializable;
+import java.net.InetAddress;
 
 public class AbstractPubSubDto implements Serializable {
 	private static final long serialVersionUID = 306233517218167600L;
 
 	private String guid;
-	private String ip;
+	private InetAddress ip;
 	private int port;
 	private boolean online;
 
@@ -18,11 +19,11 @@ public class AbstractPubSubDto implements Serializable {
 		this.guid = guid;
 	}
 
-	public String getIp() {
+	public InetAddress getIp() {
 		return ip;
 	}
 
-	public void setIp(String ip) {
+	public void setIp(InetAddress ip) {
 		this.ip = ip;
 	}
 
