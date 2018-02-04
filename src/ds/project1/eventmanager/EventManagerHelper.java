@@ -13,7 +13,7 @@ public class EventManagerHelper implements Runnable {
 	private Socket socket;
  
 	public EventManagerHelper(EventManager manager, Socket socket) {
-		this.manager = manager;
+		EventManagerHelper.manager = manager;
 		this.socket = socket;
 	}
 

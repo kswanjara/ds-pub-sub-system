@@ -23,7 +23,8 @@ public class PubSubAgent {
 		try {
 			Socket socket = new Socket(props.getProperty("server.ip"),
 					Integer.parseInt(props.getProperty("server.port.number")));
-
+			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+			outputStream.writeObject(packet);
 			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
 
 			try {
@@ -68,7 +69,7 @@ public class PubSubAgent {
 
 		switch (sc.nextInt()) {
 		case 1:
-			//connectToEventManager("Publisher");
+			publish_helper();
 			break;
 		case 2:
 			//connectToEventManager("Subscriber");
@@ -266,18 +267,20 @@ public class PubSubAgent {
 	{
 		String topic_name;
 		String keyword=null;
-		List<String> temp_list = null;
+		List<String> temp_list = new ArrayList<String>();
 		PubSubAgent pba = new PubSubAgent();
-		Scanner topic=new Scanner(System.in);
+		Scanner sc=new Scanner(System.in);
 		System.out.println("Enter the name of Topic");
-		topic_name=topic.next();
+		topic_name=sc.next();
 		Topic T = new Topic();
 		T.setName(topic_name);
         System.out.println("Enter the related keywords");
 		do{
-		    keyword = topic.next();
+		    keyword = sc.next();
 		    if(keyword.equals("done"))
 		        break;
+		    else
+		    	temp_list.add(keyword);
         } while(true);
 		T.setKeywords(temp_list);
 		pba.advertise(T);

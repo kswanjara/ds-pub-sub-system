@@ -14,7 +14,7 @@ public class ConnectionManager implements Runnable {
 	private Properties props;
 
 	public ConnectionManager(EventManager manager) {
-		this.manager = manager;
+		ConnectionManager.manager = manager;
 	}
 
 	@Override
@@ -28,7 +28,7 @@ public class ConnectionManager implements Runnable {
 
 			while (true) {
 				socket = serverSocket.accept();
-				Thread t = new Thread(new EventManagerHelper(this.manager, socket));
+				Thread t = new Thread(new EventManagerHelper(manager, socket));
 				t.start();
 			}
 
