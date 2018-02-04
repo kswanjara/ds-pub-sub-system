@@ -5,7 +5,6 @@ import java.util.List;
 
 public class Topic implements Serializable{
 
-
 	private int id;
 	private List<String> keywords;
 	private String name;

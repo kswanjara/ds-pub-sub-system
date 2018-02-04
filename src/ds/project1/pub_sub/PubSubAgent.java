@@ -99,21 +99,21 @@ public class PubSubAgent {
 		subscriberDto.setIp(InetAddress.getLocalHost());
 	}
 
-	public void subscribe(Topic topic) {
+	private void subscribe(Topic topic) {
 		Packet packet = new Packet(topic, null, PacketConstants.TopicList.toString(), subscriberDto);
 		Packet replyFromServer = connectToEventManager(packet);
 	}
 
-	public void subscribe_helper() {
+	private void subscribe_helper() {
 		System.out.println("Select 1 of these tasks that you want to do:");
-		System.out.println("Press 1 for subscribing to a topic using keywords \nPress 2 for subscribing directly to a topic using it's name \nPress 3 for unsubscribing from a topic \nPress 4 to show all th topics");
+		System.out.println("Press 1 for subscribing to a topic using keywords \nPress 2 for subscribing directly to a topic using it's name \nPress 3 for unsubscribing from a topic \nPress 4 to show all the topics \n Press 5 to unsubscribe from all the topics that you have subscribed for");
 		Scanner sc = new Scanner(System.in);
 		while(sc.hasNextInt()) {
-			switch (sc.nextInt()){
+			switch (sc.nextInt()) {
 				case 1:
 					System.out.println("Enter the keywords for the topic that you are interested in a single line separated with a comma:");
 					String keywords = null;
-					while (sc.hasNext()){
+					while (sc.hasNext()) {
 						keywords = sc.nextLine();
 					}
 					assert keywords != null;
@@ -122,40 +122,71 @@ public class PubSubAgent {
 
 				case 2:
 					Packet newPacket = new Packet(null, null, PacketConstants.TopicList.toString(), null);
-					Packet recievedPacket =  connectToEventManager(newPacket);
+					Packet recievedPacket = connectToEventManager(newPacket);
 					List<Topic> topicList = recievedPacket.getTopicList();
 
 					System.out.println("These are the topics available for you to subscribe :\n");
-					for(Topic topic : topicList){
+					for (Topic topic : topicList) {
 						System.out.println(topic.getName());
 					}
 					System.out.println("Enter the topic name you want to subscribe to:");
 					String input_topic = sc.next();
-					List<Topic> temp_list =  topicList.stream().filter(p -> p.getName().equals(input_topic)).collect(Collectors.toList());
-					if(temp_list.size() > 0 )
-					{
-					 	Topic topicSelected = temp_list.get(0);
+					List<Topic> temp_list = topicList.stream().filter(p -> p.getName().equals(input_topic)).collect(Collectors.toList());
+					if (temp_list.size() > 0) {
+						Topic topicSelected = temp_list.get(0);
 						subscribe(topicSelected);
-					}else{
+					} else {
 						System.out.println("Incorrect topic name. Please Try again...");
 						subscribe_helper();
 					}
 
 				case 3:
+					Packet packet = new Packet(null, null, PacketConstants.getSubscribedTopics.toString(), subscriberDto);
+					Packet subscribedTopics = connectToEventManager(packet);
+					List<Topic> subscribedTopicList = subscribedTopics.getTopicList();
+
+					System.out.println("These are the topics you are to subscribed to :\n");
+					for (Topic topic : subscribedTopicList) {
+						System.out.println(topic.getName());
+					}
+					System.out.println("Enter the topic you want to unsubscribe from:\n");
+
+					String unsubscribeTopic = null;
+					while (sc.hasNext()) {
+						unsubscribeTopic = sc.next();
+					}
+					String finalUnsubscribeTopic = unsubscribeTopic;
+					List<Topic> temporary_list = subscribedTopicList.stream().filter(p -> p.getName().equals(finalUnsubscribeTopic)).collect(Collectors.toList());
+					if (temporary_list.size() > 0) {
+						Topic topicSelected = temporary_list.get(0);
+						unsubscribe(topicSelected);
+					} else {
+						System.out.println("Incorrect topic name. Topic name not in the list pf topics that you are subscribed to.\nPlease Try again...");
+						subscribe_helper();
+					}
 
 				case 4:
+					Packet tempPacket = new Packet(null, null, PacketConstants.getSubscribedTopics.toString(), subscriberDto);
+					Packet allSubscribedTopics = connectToEventManager(tempPacket);
+					List<Topic> allSubscribedTopicList = allSubscribedTopics.getTopicList();
+
+					System.out.println("These are the topics you are to subscribed to :\n");
+					for (Topic topic : allSubscribedTopicList) {
+						System.out.println(topic.getName());
+					}
+				case 5:
 
 				default:
 					System.out.println("Enter correct number again please:");
 					subscribe_helper();
 			}
-
 		}
 	}
 	public void subscribe(List<String> keyword) {
 		Packet packet = new Packet(null, null, PacketConstants.TopicList.toString(), null);
 		Packet recievedPacket =  connectToEventManager(packet);
 		List<Topic> topicList = recievedPacket.getTopicList();
+		List<Topic> temp_list =  topicList.stream().filter(p -> p.getKeywords().equals(topicList)).collect(Collectors.toList());
 
 		//Write code to filter the results using keywords
 		//return topic names from event manager
@@ -163,7 +194,8 @@ public class PubSubAgent {
 	}
 
 	public void unsubscribe(Topic topic) {
-
+		Packet packet = new Packet(topic, null, PacketConstants.UnsubscribeTopic.toString(), subscriberDto);
+		Packet replyFromServer = connectToEventManager(packet);
 	}
 
 	public void unsubscribe() {
