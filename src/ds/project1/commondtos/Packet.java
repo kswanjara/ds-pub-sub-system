@@ -4,12 +4,23 @@ import ds.project1.eventmanager.dto.AbstractPubSubDto;
 import ds.project1.eventmanager.dto.SubscriberDto;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Packet implements Serializable{
     private Topic topic;
     private Event event;
     private String type;
     private AbstractPubSubDto abstractPubSubDto;
+
+    public List<String> getTopicList() {
+        return TopicList;
+    }
+
+    public void setTopicList(List<String> topicList) {
+        TopicList = topicList;
+    }
+
+    private List<String> TopicList;
 
     public Packet(){
 

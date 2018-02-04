@@ -16,6 +16,7 @@ public class PubSubAgent {
 	private static Properties props;
 
 	private static Packet connectToEventManager(Packet packet) {
+		Packet replyFromServer = null;
 		try {
 			Socket socket = new Socket(props.getProperty("server.ip"),
 					Integer.parseInt(props.getProperty("server.port.number")));
@@ -23,9 +24,8 @@ public class PubSubAgent {
 			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
 
 			try {
-				return (Packet) inputStream.readObject();
-			}
-			catch (IOException e) {
+				replyFromServer = (Packet) inputStream.readObject();
+			} catch (IOException e) {
 				System.out.println(e);
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
@@ -38,6 +38,7 @@ public class PubSubAgent {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return replyFromServer;
 	}
 
 	private static void loadProperties() {
