@@ -43,16 +43,24 @@ public class AbstractPubSubDto implements Serializable {
 		this.online = online;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((guid == null) ? 0 : guid.hashCode());
-		result = prime * result + ((ip == null) ? 0 : ip.hashCode());
-		result = prime * result + port;
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -67,17 +75,12 @@ public class AbstractPubSubDto implements Serializable {
 				return false;
 		} else if (!guid.equals(other.guid))
 			return false;
-		if (ip == null) {
-			if (other.ip != null)
-				return false;
-		} else if (!ip.equals(other.ip))
-			return false;
-		return port == other.port;
+		return true;
 	}
 
 	@Override
 	public String toString() {
 		return "AbstractPubSubDto [guid=" + guid + ", ip=" + ip + ", port=" + port + ", online=" + online + "]";
 	}
-	
+
 }

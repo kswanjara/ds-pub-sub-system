@@ -2,12 +2,15 @@ package ds.project1.eventmanager;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import ds.project1.commondtos.ConnectionDetails;
 import ds.project1.commondtos.Event;
@@ -52,7 +55,7 @@ public class EventManager implements CallBack {
 	 * notify all subscribers of new event
 	 */
 	private void notifySubscribers(Event event) {
-
+		new Thread(new EventNotifier(new EventManager(), event, getAllData().getTopicDetails().get(event.getTopic())));
 	}
 
 	/*
@@ -68,28 +71,48 @@ public class EventManager implements CallBack {
 	 * add subscriber to the internal list
 	 */
 	private void addSubscriber(AbstractPubSubDto abstractPubSubDto) {
-		getAllData().getSubscriberList().add((SubscriberDto) abstractPubSubDto);
+		SubscriberDto dto = (SubscriberDto) abstractPubSubDto;
+		if (!getAllData().getSubscriberList().contains(dto)) {
+			dto.setSelfQueue(new ArrayDeque<Event>());
+			getAllData().getSubscriberList().add(dto);
+		} else {
+			List<SubscriberDto> list = getAllData().getSubscriberList().stream()
+					.filter(p -> p.getGuid().equals(abstractPubSubDto.getGuid())).collect(Collectors.toList());
+			if (list.size() == 1) {
+				SubscriberDto existingDto = list.get(0);
+
+				getAllData().getSubscriberList().remove(existingDto);
+
+				existingDto.setIp(dto.getIp());
+				existingDto.setPort(dto.getPort());
+				existingDto.setOnline(dto.isOnline());
+
+				getAllData().getSubscriberList().add(existingDto);
+			}
+		}
 	}
 
 	/*
 	 * remove subscriber from the list
 	 */
-	private void removeSubscriber() {
-
+	private void removeSubscriber(AbstractPubSubDto abstractPubSubDto) {
+		getAllData().getSubscriberList().remove((SubscriberDto) abstractPubSubDto);
 	}
 
 	/*
 	 * show the list of subscriber for a specified topic
 	 */
 	private void showSubscribers(Topic topic) {
-
+		List<SubscriberDto> sublist = getAllData().getTopicDetails().get(topic);
+		System.out.println("Subscribers for Topic : " + topic.getName());
+		int counter = 1;
+		for (SubscriberDto subscriberDto : sublist) {
+			System.out.println(counter++ + subscriberDto.getGuid());
+		}
 	}
 
 	public static void main(String[] args) {
 		new EventManager().startService();
-		while (true) {
-
-		}
 	}
 
 	private static DataManagerDto getAllData() {
@@ -97,7 +120,14 @@ public class EventManager implements CallBack {
 	}
 
 	private static void subscribeToTopic(AbstractPubSubDto abstractPubSubDto, Topic topic) {
-		// List<Sub>
+		List<SubscriberDto> list = getAllData().getSubscriberList().stream()
+				.filter(p -> p.getGuid().equals(abstractPubSubDto.getGuid())).collect(Collectors.toList());
+		if (list.size() == 1) {
+			SubscriberDto dto = list.get(0);
+			list = getAllData().getTopicDetails().get(topic);
+			list.add(dto);
+			getAllData().getTopicDetails().put(topic, list);
+		}
 	}
 
 	private static Set<Topic> getAllTopics() {
@@ -128,13 +158,17 @@ public class EventManager implements CallBack {
 				} else if (packet.getType().trim().equals(PacketConstants.SubscriberDto.toString())) {
 					// Subscriber notifying about the status
 					addSubscriber(packet.getAbstractPubSubDto());
+				} else if (packet.getType().trim().equals(PacketConstants.UnsubscribeTopic.toString())) {
+					// return the list of all topics
+					Set<Topic> set = getAllTopics();
+					List<Topic> list = new ArrayList<>(set);
+					packet.setTopicList(list);
 				} else if (packet.getType().trim().equals(PacketConstants.TopicList.toString())) {
 					// return the list of all topics
 					Set<Topic> set = getAllTopics();
 					List<Topic> list = new ArrayList<>(set);
 					packet.setTopicList(list);
 				}
-
 			}
 		}
 		return packet;
@@ -142,6 +176,11 @@ public class EventManager implements CallBack {
 
 	private void addPublisher(AbstractPubSubDto abstractPubSubDto) {
 		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void cacheEventForSubscriber(Event event, SubscriberDto subscriberDto) {
 
 	}
 
