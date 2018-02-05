@@ -63,33 +63,40 @@ public class PubSubAgent {
 
 	public static void main(String[] args) {
 		loadProperties();
-		
-		System.out.println("What am I? \n1. Publisher 2. Subscriber 3. Advertise");
+
 		Scanner sc = new Scanner(System.in);
-
-		switch (sc.nextInt()) {
-		case 1:
-			publish_helper();
-			break;
-		case 2:
-			//connectToEventManager("Subscriber");
-			PubSubAgent pubSubAgent = new PubSubAgent();
-			try {
-				loadSubscriberDto();
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
+		boolean done = false;
+		while (!(done))
+		{
+			System.out.println("What am I? \n1. Publisher 2. Subscriber 3. Advertise 0. Quit");
+			int ch = sc.nextInt();
+			switch (ch) {
+				case 1:
+					publish_helper();
+					break;
+				case 2:
+					//connectToEventManager("Subscriber");
+					PubSubAgent pubSubAgent = new PubSubAgent();
+					try {
+						loadSubscriberDto();
+					} catch (UnknownHostException e) {
+						e.printStackTrace();
+					}
+					Packet packet = new Packet(null, null, PacketConstants.SubscriberDto.toString(), subscriberDto);
+					Packet replyFromServer = connectToEventManager(packet);
+					pubSubAgent.subscribe_helper();
+					break;
+				case 3:
+					advertise_helper();
+					break;
+				case 0:
+					done = true;
+					System.out.println("You have quit successfully");
+					break;
+				default:
+					break;
 			}
-			Packet packet = new Packet(null, null, PacketConstants.SubscriberDto.toString(), subscriberDto);
-			Packet replyFromServer = connectToEventManager(packet);
-			pubSubAgent.subscribe_helper();
-			break;
-		case 3:
-			advertise_helper();
-			break;
-		default:
-			break;
 		}
-
 	}
 
 	private static void loadSubscriberDto() throws UnknownHostException {
