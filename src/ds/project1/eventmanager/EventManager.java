@@ -76,7 +76,7 @@ public class EventManager implements CallBack {
 	/*
 	 * add subscriber to the internal list
 	 */
-	private void addSubscriber(AbstractPubSubDto abstractPubSubDto) {
+	private Packet addSubscriber(AbstractPubSubDto abstractPubSubDto, Packet packet) {
 		SubscriberDto dto = (SubscriberDto) abstractPubSubDto;
 		if (!getAllData().getSubscriberList().contains(dto)) {
 			dto.setSelfQueue(new ArrayDeque<Event>());
@@ -100,11 +100,13 @@ public class EventManager implements CallBack {
 				if (dto.isOnline() && !existingDto.getSelfQueue().isEmpty()) {
 					Event temp[] = {};
 					List<Event> eventList = Arrays.asList(existingDto.getSelfQueue().toArray(temp));
-					new Thread(new EventNotifier(new EventManager(), eventList, list)).start();
+					packet.setEventList(eventList);
+					// new Thread(new EventNotifier(new EventManager(), eventList, list)).start();
 				}
 				getAllData().getSubscriberList().add(existingDto);
 			}
 		}
+		return packet;
 	}
 
 	/*
@@ -172,7 +174,7 @@ public class EventManager implements CallBack {
 					addPublisher(packet.getAbstractPubSubDto());
 				} else if (packet.getType().trim().equals(PacketConstants.SubscriberDto.toString())) {
 					// Subscriber notifying about the status
-					addSubscriber(packet.getAbstractPubSubDto());
+					packet = addSubscriber(packet.getAbstractPubSubDto(), packet);
 				} else if (packet.getType().trim().equals(PacketConstants.UnsubscribeTopic.toString())) {
 					// return the list of all topics
 					Set<Topic> set = getAllTopics();
