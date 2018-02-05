@@ -14,6 +14,7 @@ public class Packet implements Serializable {
 	private String type;
 	private AbstractPubSubDto abstractPubSubDto;
 	private List<Topic> TopicList;
+	private List<Event> eventList;
 
 	public List<Topic> getTopicList() {
 		return TopicList;
@@ -64,5 +65,13 @@ public class Packet implements Serializable {
 
 	public void setAbstractPubSubDto(AbstractPubSubDto abstractPubSubDto) {
 		this.abstractPubSubDto = abstractPubSubDto;
+	}
+
+	public List<Event> getEventList() {
+		return eventList;
+	}
+
+	public void setEventList(List<Event> eventList) {
+		this.eventList = eventList;
 	}
 }

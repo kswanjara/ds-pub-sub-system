@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +57,11 @@ public class EventManager implements CallBack {
 	 * notify all subscribers of new event
 	 */
 	private void notifySubscribers(Event event) {
-		new Thread(new EventNotifier(new EventManager(), event, getAllData().getTopicDetails().get(event.getTopic())));
+		List<Event> tempList = new ArrayList<Event>();
+		tempList.add(event);
+		new Thread(
+				new EventNotifier(new EventManager(), tempList, getAllData().getTopicDetails().get(event.getTopic())))
+						.start();
 	}
 
 	/*
@@ -79,7 +85,9 @@ public class EventManager implements CallBack {
 			List<SubscriberDto> list = getAllData().getSubscriberList().stream()
 					.filter(p -> p.getGuid().equals(abstractPubSubDto.getGuid())).collect(Collectors.toList());
 			if (list.size() == 1) {
+
 				SubscriberDto existingDto = list.get(0);
+				list.remove(0);
 
 				getAllData().getSubscriberList().remove(existingDto);
 
@@ -87,6 +95,13 @@ public class EventManager implements CallBack {
 				existingDto.setPort(dto.getPort());
 				existingDto.setOnline(dto.isOnline());
 
+				list.add(existingDto);
+
+				if (dto.isOnline() && !existingDto.getSelfQueue().isEmpty()) {
+					Event temp[] = {};
+					List<Event> eventList = Arrays.asList(existingDto.getSelfQueue().toArray(temp));
+					new Thread(new EventNotifier(new EventManager(), eventList, list)).start();
+				}
 				getAllData().getSubscriberList().add(existingDto);
 			}
 		}
@@ -176,12 +191,24 @@ public class EventManager implements CallBack {
 
 	private void addPublisher(AbstractPubSubDto abstractPubSubDto) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void cacheEventForSubscriber(Event event, SubscriberDto subscriberDto) {
+	public void cacheEventForSubscriber(List<Event> events, SubscriberDto dto) {
+		if (getAllData().getSubscriberList().contains(dto)) {
+			List<SubscriberDto> list = getAllData().getSubscriberList().stream()
+					.filter(p -> p.getGuid().equals(dto.getGuid())).collect(Collectors.toList());
+			if (list.size() == 1) {
+				SubscriberDto existingDto = list.get(0);
 
+				getAllData().getSubscriberList().remove(existingDto);
+
+				existingDto.setOnline(false);
+				existingDto.getSelfQueue().addAll(events);
+
+				getAllData().getSubscriberList().add(existingDto);
+			}
+		}
 	}
 
 }

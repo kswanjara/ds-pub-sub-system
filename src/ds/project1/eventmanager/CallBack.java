@@ -1,5 +1,7 @@
 package ds.project1.eventmanager;
 
+import java.util.List;
+
 import ds.project1.commondtos.ConnectionDetails;
 import ds.project1.commondtos.Event;
 import ds.project1.commondtos.Packet;
@@ -10,5 +12,5 @@ public interface CallBack {
 
 	public Packet handlePacket(Packet packet);
 
-	public void cacheEventForSubscriber(Event event, SubscriberDto subscriberDto);
+	public void cacheEventForSubscriber(List<Event> events, SubscriberDto subscriberDto);
 }
