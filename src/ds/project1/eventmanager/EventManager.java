@@ -176,10 +176,14 @@ public class EventManager implements CallBack {
 					// Subscriber notifying about the status
 					packet = addSubscriber(packet.getAbstractPubSubDto(), packet);
 				} else if (packet.getType().trim().equals(PacketConstants.UnsubscribeTopic.toString())) {
-					// return the list of all topics
-					Set<Topic> set = getAllTopics();
-					List<Topic> list = new ArrayList<>(set);
-					packet.setTopicList(list);
+					// remove subscriber from a particular topic
+					unsubscribeTopic(packet.getTopic(), (SubscriberDto) packet.getAbstractPubSubDto());
+				} else if (packet.getType().trim().equals(PacketConstants.UnsubscribeAll.toString())) {
+					// remove subscriber from a all topics
+					unsubscribeAll((SubscriberDto) packet.getAbstractPubSubDto());
+				} else if (packet.getType().trim().equals(PacketConstants.SubscribedTopics.toString())) {
+					// return the list of all subscribed topics
+					packet.setTopicList(getSubscribedTopicsList((SubscriberDto) packet.getAbstractPubSubDto()));
 				} else if (packet.getType().trim().equals(PacketConstants.TopicList.toString())) {
 					// return the list of all topics
 					Set<Topic> set = getAllTopics();
@@ -189,6 +193,35 @@ public class EventManager implements CallBack {
 			}
 		}
 		return packet;
+	}
+
+	private List<Topic> getSubscribedTopicsList(SubscriberDto subDto) {
+		// TODO Auto-generated method stub
+		Set<Topic> set = getAllTopics();
+		List<Topic> subscribedTopics = new ArrayList<>();
+
+		for (Topic topic : set) {
+			if (getAllData().getTopicDetails().get(topic).contains(subDto)) {
+				subscribedTopics.add(topic);
+			}
+		}
+
+		return subscribedTopics;
+	}
+
+	private void unsubscribeAll(SubscriberDto subDto) {
+		// TODO Auto-generated method stub
+		Set<Topic> set = getAllTopics();
+		List<Topic> subscribedTopics = new ArrayList<>();
+
+		for (Topic topic : set) {
+			getAllData().getTopicDetails().get(topic).remove(subDto);
+		}
+	}
+
+	private void unsubscribeTopic(Topic topic, SubscriberDto subDto) {
+		// TODO Auto-generated method stub
+		getAllData().getTopicDetails().get(topic).remove(subDto);
 	}
 
 	private void addPublisher(AbstractPubSubDto abstractPubSubDto) {

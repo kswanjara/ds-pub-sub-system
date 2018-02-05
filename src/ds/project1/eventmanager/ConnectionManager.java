@@ -27,7 +27,9 @@ public class ConnectionManager implements Runnable {
 			Socket socket;
 
 			while (true) {
+				System.out.println("Event Manager is ready to accept the connections !");
 				socket = serverSocket.accept();
+				System.out.println("Got the connect request !");
 				Thread t = new Thread(new EventManagerHelper(manager, socket));
 				t.start();
 			}
