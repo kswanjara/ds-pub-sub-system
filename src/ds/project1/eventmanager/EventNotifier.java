@@ -3,7 +3,9 @@ package ds.project1.eventmanager;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,18 +32,32 @@ public class EventNotifier implements Runnable {
 
 	@Override
 	public void run() {
+		notityUser();
+	}
+
+	public void notityUser() {
 		SubscriberDto dto = null;
 		try {
 			Packet packet = new Packet(null, null, PacketConstants.Event.toString(), null);
-			packet.setEventList(event);
 			for (SubscriberDto subscriberDto : this.subscribers) {
 				dto = subscriberDto;
 				SubscriberDto dto1 = subscriberDto;
 				List<SubscriberDto> existing = allSubscribers.stream().filter(p -> p.getGuid().equals(dto1.getGuid()))
 						.collect(Collectors.toList());
 				if (existing.size() > 0) {
+
 					subscriberDto = existing.get(0);
 					if (subscriberDto.isOnline()) {
+						allSubscribers.remove(subscriberDto);
+
+						Event temp[] = {};
+						List<Event> eventList = Arrays.asList(subscriberDto.getSelfQueue().toArray(temp));
+						event.addAll(eventList);
+						packet.setEventList(event);
+
+						subscriberDto.setSelfQueue(new ArrayDeque<Event>());
+						allSubscribers.add(subscriberDto);
+
 						// push in the socket output stream
 						Socket socket = new Socket(subscriberDto.getIp(), subscriberDto.getPort());
 						ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -53,13 +69,16 @@ public class EventNotifier implements Runnable {
 					}
 				}
 			}
+			manager.updateAllSubscribers(allSubscribers);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			if (dto != null) {
 				manager.cacheEventForSubscriber(event, dto);
 				System.out.println("Following exception occured. Cached the event for subscriber.");
+				this.subscribers.remove(dto);
 			}
 			e.printStackTrace();
+			this.notityUser();
 		}
 	}
 

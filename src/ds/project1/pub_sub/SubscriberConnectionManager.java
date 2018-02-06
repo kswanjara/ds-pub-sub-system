@@ -41,32 +41,20 @@ public class SubscriberConnectionManager implements Runnable{
                 socket.close();
             }
 
-        } catch (NumberFormatException | IOException | ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-    private void loadProperties() {
-        try {
-            /*String appConfigPath = System.getProperty("java.class.path") + System.getProperty("file.separator")
-                    + "application.properties";*/
+		} catch (NumberFormatException | IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-			Properties appProps = new Properties();
-			appProps.load(SubscriberConnectionManager.class.getClassLoader().getResourceAsStream("application.properties"));
-
-            props = new Properties();
-            props.load(SubscriberConnectionManager.class.getClassLoader().getResourceAsStream("application.properties"));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    public PubSubCallback getManager() {
-        return manager;
-    }
-
-    public void setManager(PubSubCallback manager) {
-        this.manager = manager;
-    }
+	private void loadProperties() {
+		try {
+			props = new Properties();
+			props.load(
+					SubscriberConnectionManager.class.getClassLoader().getResourceAsStream("application.properties"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
