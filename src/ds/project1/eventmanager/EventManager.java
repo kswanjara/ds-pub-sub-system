@@ -1,15 +1,5 @@
 package ds.project1.eventmanager;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import ds.project1.commondtos.ConnectionDetails;
 import ds.project1.commondtos.Event;
 import ds.project1.commondtos.Packet;
@@ -19,6 +9,11 @@ import ds.project1.eventmanager.dto.AbstractPubSubDto;
 import ds.project1.eventmanager.dto.DataManagerDto;
 import ds.project1.eventmanager.dto.PublisherDto;
 import ds.project1.eventmanager.dto.SubscriberDto;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class EventManager implements CallBack {
 
@@ -97,9 +92,7 @@ public class EventManager implements CallBack {
 					List<Event> eventList = Arrays.asList(existingDto.getSelfQueue().toArray(temp));
 					packet.setEventList(eventList);
 					// new Thread(new EventNotifier(new EventManager(), eventList, list)).start();
-					existingDto.setSelfQueue(new ArrayDeque<Event>());
 				}
-
 				getAllData().getSubscriberList().add(existingDto);
 			}
 		}
@@ -126,8 +119,7 @@ public class EventManager implements CallBack {
 	}
 
 	public static void main(String[] args) {
-		EventManager eventManager = new EventManager();
-		eventManager.startService();
+		new EventManager().startService();
 	}
 
 	private static DataManagerDto getAllData() {
@@ -153,11 +145,6 @@ public class EventManager implements CallBack {
 	public Packet handlePacket(Packet packet) {
 		if (packet != null) {
 			if (packet.getType() != null && !packet.getType().trim().equals("")) {
-				// update status of subscriber to online
-				if (packet.getAbstractPubSubDto() != null && packet.getAbstractPubSubDto() instanceof SubscriberDto) {
-					changeSubscriberStatus((SubscriberDto) packet.getAbstractPubSubDto(), true);
-				}
-
 				if (packet.getType().trim().equals(PacketConstants.Topic.toString())) {
 					// check what is the type of object in abstractPubSubDto
 					if (packet.getAbstractPubSubDto() != null
@@ -215,6 +202,8 @@ public class EventManager implements CallBack {
 	private void unsubscribeAll(SubscriberDto subDto) {
 		// TODO Auto-generated method stub
 		Set<Topic> set = getAllTopics();
+		List<Topic> subscribedTopics = new ArrayList<>();
+
 		for (Topic topic : set) {
 			getAllData().getTopicDetails().get(topic).remove(subDto);
 		}
@@ -227,19 +216,6 @@ public class EventManager implements CallBack {
 
 	private void addPublisher(AbstractPubSubDto abstractPubSubDto) {
 		// TODO Auto-generated method stub
-	}
-
-	private void changeSubscriberStatus(SubscriberDto dto, boolean status) {
-		if (getAllData().getSubscriberList().contains(dto)) {
-			List<SubscriberDto> list = getAllData().getSubscriberList().stream()
-					.filter(p -> p.getGuid().equals(dto.getGuid())).collect(Collectors.toList());
-			if (list.size() == 1) {
-				SubscriberDto existingDto = list.get(0);
-				getAllData().getSubscriberList().remove(existingDto);
-				existingDto.setOnline(status);
-				getAllData().getSubscriberList().add(existingDto);
-			}
-		}
 	}
 
 	@Override
@@ -258,12 +234,6 @@ public class EventManager implements CallBack {
 				getAllData().getSubscriberList().add(existingDto);
 			}
 		}
-	}
-
-	@Override
-	public void updateAllSubscribers(List<SubscriberDto> allSubscribers) {
-		// TODO Auto-generated method stub
-		getAllData().setSubscriberList(allSubscribers);
 	}
 
 }

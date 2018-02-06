@@ -13,6 +13,4 @@ public interface CallBack {
 	public Packet handlePacket(Packet packet);
 
 	public void cacheEventForSubscriber(List<Event> events, SubscriberDto subscriberDto);
-
-	public void updateAllSubscribers(List<SubscriberDto> allSubscribers);
 }
