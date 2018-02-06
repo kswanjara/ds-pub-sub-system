@@ -10,47 +10,47 @@ import java.util.Properties;
 
 public class PublisherConnectionManager implements Runnable {
 
-        private PublisherEventManager manager;
+	private PublisherEventManager manager;
 
-        private Properties props;
+	private Properties props;
 
-        public PublisherConnectionManager(PublisherEventManager manager) {
-            this.manager = manager;
-        }
+	public PublisherConnectionManager(PublisherEventManager manager) {
+		this.manager = manager;
+	}
 
-        @Override
-        public void run() {
-            try {
-                loadProperties();
+	@Override
+	public void run() {
+		try {
+			loadProperties();
 
-                @SuppressWarnings("resource")
-                ServerSocket serverSocket = new ServerSocket(Integer.parseInt(props.getProperty("publisher.port.number")));
-                Socket socket;
+			@SuppressWarnings("resource")
+			ServerSocket serverSocket = new ServerSocket(Integer.parseInt(props.getProperty("publisher.port.number")));
+			Socket socket;
 
-                while (true) {
-                    socket = serverSocket.accept();
-                    manager.newConnection(new ConnectionDetails(socket, "New Connection !"));
-                }
+			while (true) {
+				socket = serverSocket.accept();
+				manager.newConnection(new ConnectionDetails(socket, "New Connection !"));
+			}
 
-            } catch (NumberFormatException | IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
+		} catch (NumberFormatException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-        private void loadProperties() {
-            try {
-                String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
-                String appConfigPath = rootPath + "application.properties";
+	private void loadProperties() {
+		try {
+			String appConfigPath = System.getProperty("java.class.path") + System.getProperty("file.separator")
+					+ "application.properties";
 
-                Properties appProps = new Properties();
-                appProps.load(new FileInputStream(appConfigPath));
+			Properties appProps = new Properties();
+			appProps.load(new FileInputStream(appConfigPath));
 
-                props = new Properties();
-                props.load(new FileInputStream(appConfigPath));
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
+			props = new Properties();
+			props.load(new FileInputStream(appConfigPath));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}

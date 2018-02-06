@@ -59,9 +59,8 @@ public class EventManager implements CallBack {
 	private void notifySubscribers(Event event) {
 		List<Event> tempList = new ArrayList<Event>();
 		tempList.add(event);
-		new Thread(
-				new EventNotifier(new EventManager(), tempList, getAllData().getTopicDetails().get(event.getTopic())))
-						.start();
+		new Thread(new EventNotifier(new EventManager(), tempList, getAllData().getTopicDetails().get(event.getTopic()),
+				getAllData().getSubscriberList())).start();
 	}
 
 	/*

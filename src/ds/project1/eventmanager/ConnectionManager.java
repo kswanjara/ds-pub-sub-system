@@ -42,8 +42,8 @@ public class ConnectionManager implements Runnable {
 
 	private void loadProperties() {
 		try {
-			String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
-			String appConfigPath = rootPath + "application.properties";
+			String appConfigPath = System.getProperty("java.class.path") + System.getProperty("file.separator")
+					+ "application.properties";
 
 			Properties appProps = new Properties();
 			appProps.load(new FileInputStream(appConfigPath));
