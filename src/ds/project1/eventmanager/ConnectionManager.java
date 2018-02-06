@@ -27,32 +27,27 @@ public class ConnectionManager implements Runnable {
 			Socket socket;
 
 			while (true) {
-				System.out.println("Event Manager is ready to accept the connections !");
+				System.out.println("ConnectionManagerThread: Ready to accept the connections !");
 				socket = serverSocket.accept();
-				System.out.println("Got the connect request !");
+				System.out.println("ConnectionManagerThread: Got the connect request !");
 				Thread t = new Thread(new EventManagerHelper(manager, socket));
 				t.start();
 			}
 
 		} catch (NumberFormatException | IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("ConnectionManagerThread: Exception occured: " + e.getMessage());
+			// e.printStackTrace();
 		}
 	}
 
 	private void loadProperties() {
 		try {
-			String appConfigPath = System.getProperty("java.class.path") + System.getProperty("file.separator")
-					+ "application.properties";
-
-			Properties appProps = new Properties();
-			appProps.load(new FileInputStream(appConfigPath));
-
 			props = new Properties();
-			props.load(new FileInputStream(appConfigPath));
+			props.load(ConnectionManager.class.getClassLoader().getResourceAsStream("application.properties"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("ConnectionManagerThread: Exception occured: " + e.getMessage());
+			// e.printStackTrace();
 		}
 	}
 }

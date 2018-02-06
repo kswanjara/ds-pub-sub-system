@@ -39,14 +39,9 @@ public class subscriberConnectionManager implements Runnable {
 
 	private void loadProperties() {
 		try {
-			String appConfigPath = System.getProperty("java.class.path") + System.getProperty("file.separator")
-					+ "application.properties";
-
-			Properties appProps = new Properties();
-			appProps.load(new FileInputStream(appConfigPath));
-
 			props = new Properties();
-			props.load(new FileInputStream(appConfigPath));
+			props.load(
+					subscriberConnectionManager.class.getClassLoader().getResourceAsStream("application.properties"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

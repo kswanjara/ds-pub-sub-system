@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import ds.project1.commondtos.*;
 import ds.project1.ds.project1.common.enums.PacketConstants;
+import ds.project1.eventmanager.ConnectionManager;
 import ds.project1.eventmanager.dto.*;
 
 public class PubSubAgent {
@@ -48,14 +49,8 @@ public class PubSubAgent {
 
 	private static void loadProperties() {
 		try {
-			String appConfigPath = System.getProperty("java.class.path") + System.getProperty("file.separator")
-					+ "application.properties";
-
-			Properties appProps = new Properties();
-			appProps.load(new FileInputStream(appConfigPath));
-
 			props = new Properties();
-			props.load(new FileInputStream(appConfigPath));
+			props.load(PubSubAgent.class.getClassLoader().getResourceAsStream("application.properties"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -79,6 +74,7 @@ public class PubSubAgent {
 				PubSubAgent pubSubAgent = new PubSubAgent();
 				try {
 					loadSubscriberDto();
+
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 				}
@@ -104,7 +100,7 @@ public class PubSubAgent {
 		subscriberDto.setPort(8881);
 		subscriberDto.setOnline(true);
 		subscriberDto.setGuid("DNS");
-		subscriberDto.setIp(InetAddress.getLocalHost());
+		// subscriberDto.setIp(InetAddress.getLocalHost());
 	}
 
 	private void subscribe(Topic topic) {
