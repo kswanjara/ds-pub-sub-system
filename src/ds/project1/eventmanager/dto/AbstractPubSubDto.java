@@ -1,7 +1,6 @@
 package ds.project1.eventmanager.dto;
 
 import java.io.Serializable;
-import java.net.InetAddress;
 
 public class AbstractPubSubDto implements Serializable {
 	private static final long serialVersionUID = 306233517218167600L;

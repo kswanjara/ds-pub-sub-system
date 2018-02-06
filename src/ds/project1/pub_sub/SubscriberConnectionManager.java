@@ -37,6 +37,8 @@ public class SubscriberConnectionManager implements Runnable{
                 packet = (Packet) inputStream.readObject();
                 PubSubAgent pubSubAgent = new PubSubAgent();
                 pubSubAgent.handleEvent(packet);
+                inputStream.close();
+                socket.close();
             }
 
 		} catch (NumberFormatException | IOException | ClassNotFoundException e) {
