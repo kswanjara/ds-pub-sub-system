@@ -1,3 +1,13 @@
+/*
+ * PublisherEventManager.java
+ *
+ * Version:
+ *     $Id$: v 1.1
+ *
+ * Revisions:
+ *     $Log$: Initial Revision
+ */
+
 package ds.project1.pub_sub;
 
 import java.io.IOException;
@@ -5,8 +15,16 @@ import java.io.ObjectInputStream;
 
 import ds.project1.commondtos.ConnectionDetails;
 
+/**
+ * This program implements the callback interface. a object of this method is used to start a thread,
+ * which opens up the socket of the publisher for eventmanager to communicate anytime.
+ */
 public class PublisherEventManager implements CallBack{
 
+    /**
+     * It creates an input stream for the publisher socket & implements the callback interface.
+     * @param connectionDetails the object of the class Connection details.
+     */
     public void newConnection(ConnectionDetails connectionDetails) {
         System.out.println("Got new connection details!");
         try {
@@ -21,6 +39,9 @@ public class PublisherEventManager implements CallBack{
         }
     }
 
+    /**
+     * it creates a thread and starts it.
+     */
     private void startService() {
         Thread connectionThread = new Thread(new PublisherConnectionManager(new PublisherEventManager()));
         connectionThread.start();

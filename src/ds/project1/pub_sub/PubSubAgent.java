@@ -1,3 +1,13 @@
+/*
+* PubSubAgent.java
+*
+* Version:
+*     $Id$: v 1.1
+*
+* Revisions:
+*     $Log$: Initial Revision
+*/
+
 package ds.project1.pub_sub;
 
 import java.io.*;
@@ -13,12 +23,26 @@ import ds.project1.commondtos.*;
 import ds.project1.ds.project1.common.enums.PacketConstants;
 import ds.project1.eventmanager.dto.*;
 
+
+/**
+ * PubSub Agent consists of methods for advertising a topic, publishing a topic, subscribing a topic,
+ * unsubscribing a topic. loadproperties() method initialises the server ip, server port number to an
+ * object which is then used by connectToEventManager() to write a packet into the outputstream of
+ * Event Manager.
+ */
 public class PubSubAgent {
 	private static SubscriberDto subscriberDto;
 	private static Socket socket;
 
 	private static Properties props;
 
+    /**
+     *  This method establishes a connection with the event manager. It writes the Packet Object into the
+     *  stream of EventManager.
+     *
+     * @param packet object consisiting details about topic, event, subscriber/publisher/online status
+     * @return Packet object consisting of a topic list
+     */
 	private static Packet connectToEventManager(Packet packet) {
 		Packet replyFromServer = null;
 		try {
@@ -46,6 +70,10 @@ public class PubSubAgent {
 		return replyFromServer;
 	}
 
+    /**
+     * This method loads the properties of application. It insitialises the server.ip & server.port.number
+     * in a object which is then used to redirect packet to eventManager.
+     */
 	private static void loadProperties() {
 		try {
 			String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(""))
@@ -63,6 +91,11 @@ public class PubSubAgent {
 		}
 	}
 
+    /**
+     * The main method generates a menu on the terminal providing the user with options
+     * to publish, advertise or subscribe. Appropriate calls to methods are done.
+     * @param args ignored
+     */
 	public static void main(String[] args) {
 		loadProperties();
 
@@ -100,6 +133,10 @@ public class PubSubAgent {
 		}
 	}
 
+    /**
+     *  This method creates and instantiates the object of SubscriberDto class
+     * @throws UnknownHostException
+     */
 	private static void loadSubscriberDto() throws UnknownHostException {
 		subscriberDto = new SubscriberDto();
 		subscriberDto.setPort(8881);
@@ -108,11 +145,21 @@ public class PubSubAgent {
 		subscriberDto.setIp(InetAddress.getLocalHost());
 	}
 
+    /**
+     * This method lets the user subscribe to a topic using the name of topic
+     * @param topic object of Topic class consisting of topic name
+     */
 	private void subscribe(Topic topic) {
 		Packet packet = new Packet(topic, null, PacketConstants.TopicList.toString(), subscriberDto);
 		Packet replyFromServer = connectToEventManager(packet);
 	}
 
+    /**
+     * This helper method accepts the user input from subscriber of funcnalities it wants to utilize. viz.,
+     * subscribing with a topic name, with keywords, listing all published topics, unsubscribing to one or all topics,
+     * The calls to appropriate methods are implemented for execution of the commands.
+     *
+     */
 	private void subscribe_helper() {
 		System.out.println("Select 1 of these tasks that you want to do:");
 		System.out.println(
@@ -198,6 +245,14 @@ public class PubSubAgent {
 		}
 	}
 
+    /**
+     * This method lets the user subscribe to the topic using a list of interest keywords. A topic list is
+     * fetched from the event manager which consists of all topic objects. This list is traversed to fetch
+     * only those topic objects which have keywords of interest. The subscriber is provided the option to choose
+     * one of the filtered listed topics.
+     *
+     * @param keyword list of interested keywords
+     */
 	public void subscribe(List<String> keyword) {
 		Packet packet = new Packet(null, null, PacketConstants.TopicList.toString(), null);
 		Packet recievedPacket = connectToEventManager(packet);
@@ -231,11 +286,18 @@ public class PubSubAgent {
 		}
 	}
 
+    /**
+     * This method lets the user unsubscribe to a topic using the name of the topic
+     * @param topic Object of Topic class consisting of topic name to be unsubscribed
+     */
 	private void unsubscribe(Topic topic) {
 		Packet packet = new Packet(topic, null, PacketConstants.UnsubscribeTopic.toString(), subscriberDto);
 		Packet replyFromServer = connectToEventManager(packet);
 	}
 
+    /**
+     * This method unsubscribes all the topics by a subscriber
+     */
 	private void unsubscribe() {
 		Packet unsubscribeAllTopics = new Packet(null, null, PacketConstants.UnsubscribeAll.toString(), subscriberDto);
 		connectToEventManager(unsubscribeAllTopics);
@@ -244,6 +306,12 @@ public class PubSubAgent {
 	public void listSubscribedTopics() {
 	}
 
+    /**
+     * This method is a helper publisher method. It generates the object of Event class.
+     * It takes the input from the user about the topic details, i.e. the title, content and keywords
+     * and instantiates the Event object with  these details. It then calls the publisher method to
+     * publish the topic.
+     */
 	private static void publish_helper() {
 		PubSubAgent pubAgent = new PubSubAgent();
 		Event E = new Event();
@@ -273,6 +341,12 @@ public class PubSubAgent {
 		pubAgent.publish(E);
 	}
 
+    /**
+     * This method generates a object of PublisherEventManager which opens up a socket for
+     * event manager to communicate anytime with the publisher. It then generates the packet
+     * out of the event details passed to it from helper function.
+     * @param event object with topic details
+     */
 	private void publish(Event event) {
 		PublisherEventManager pem = new PublisherEventManager();
 		pem.startThread();
@@ -286,18 +360,26 @@ public class PubSubAgent {
 		response_from_server_to_publisher = connectToEventManager((packet_from_publisher));
 	}
 
+    /**
+     * it receives the topic object from the helper function. It then generates the packet object
+     *  which is then sent over to event manager.
+     * @param newTopic object of class topic which consists of topic details
+     */
 	private void advertise(Topic newTopic) {
 		loadProperties();
 		PublisherDto publisherDto = new PublisherDto();
 		Packet response_from_server = null;
-		Packet packet_from_advertiser = new Packet(); // how to pass parameters here
+		Packet packet_from_advertiser = new Packet();
 		packet_from_advertiser.setTopic(newTopic);
 		packet_from_advertiser.setType(PacketConstants.Topic.toString());
 		packet_from_advertiser.setAbstractPubSubDto(publisherDto);
-		response_from_server = connectToEventManager(packet_from_advertiser); // need to set connectiontoeventmanager to
-																				// accept packet instead of string
+		response_from_server = connectToEventManager(packet_from_advertiser);
 	}
 
+	/**
+	 * This method creates and instantiates the object of class topic and aceepts user input
+     * for topic details. it then passes on the topic object to advertise method.
+	 */
 	private static void advertise_helper() {
 		String topic_name;
 		String keyword = null;

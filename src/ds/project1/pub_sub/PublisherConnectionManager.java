@@ -1,3 +1,13 @@
+/*
+ * PublisherConnectionManager.java
+ *
+ * Version:
+ *     $Id$: v 1.1
+ *
+ * Revisions:
+ *     $Log$: Initial Revision
+ */
+
 package ds.project1.pub_sub;
 
 import ds.project1.commondtos.ConnectionDetails;
@@ -8,6 +18,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
 
+/**
+ *  The connection manager creates a socket for the publisher. It
+ */
 public class PublisherConnectionManager implements Runnable {
 
         private PublisherEventManager manager;
