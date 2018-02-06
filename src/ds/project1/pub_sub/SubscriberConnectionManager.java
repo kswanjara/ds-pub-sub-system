@@ -20,14 +20,14 @@ public class SubscriberConnectionManager implements Runnable{
         this.manager = manager;
     }
 
-    @Override
-    public void run() {
-        try {
-            loadProperties();
+	@Override
+	public void run() {
+		try {
+			loadProperties();
 
-            @SuppressWarnings("resource")
-            ServerSocket serverSocket = new ServerSocket(Integer.parseInt(props.getProperty("subscriber.port.number")));
-            Socket socket;
+			@SuppressWarnings("resource")
+			ServerSocket serverSocket = new ServerSocket(Integer.parseInt(props.getProperty("subscriber.port.number")));
+			Socket socket;
 
             while (true) {
                 socket = serverSocket.accept();
@@ -39,32 +39,20 @@ public class SubscriberConnectionManager implements Runnable{
                 pubSubAgent.handleEvent(packet);
             }
 
-        } catch (NumberFormatException | IOException | ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-    private void loadProperties() {
-        try {
-            String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
-            String appConfigPath = rootPath + "application.properties";
+		} catch (NumberFormatException | IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-            Properties appProps = new Properties();
-            appProps.load(new FileInputStream(appConfigPath));
-
-            props = new Properties();
-            props.load(new FileInputStream(appConfigPath));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    public PubSubCallback getManager() {
-        return manager;
-    }
-
-    public void setManager(PubSubCallback manager) {
-        this.manager = manager;
-    }
+	private void loadProperties() {
+		try {
+			props = new Properties();
+			props.load(
+					SubscriberConnectionManager.class.getClassLoader().getResourceAsStream("application.properties"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
