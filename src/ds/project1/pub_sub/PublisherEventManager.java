@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 
 import ds.project1.commondtos.ConnectionDetails;
 
-public class PublisherEventManager implements CallBack{
+public class PublisherEventManager {
 
     public void newConnection(ConnectionDetails connectionDetails) {
         System.out.println("Got new connection details!");
@@ -13,7 +13,7 @@ public class PublisherEventManager implements CallBack{
             // ObjectOutputStream outputStream = new
             // ObjectOutputStream(connectionDetails.getSocket().getOutputStream());
             ObjectInputStream inputStream = new ObjectInputStream(connectionDetails.getSocket().getInputStream());
-            System.out.println("Connection from Event Manager");
+            System.out.println("Connection from the Event Manager");
 
 
         } catch (IOException e) {

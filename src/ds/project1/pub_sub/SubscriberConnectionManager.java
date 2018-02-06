@@ -1,19 +1,22 @@
 package ds.project1.pub_sub;
 
 import ds.project1.commondtos.ConnectionDetails;
+import ds.project1.commondtos.Packet;
+import ds.project1.eventmanager.CallBack;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Objects;
 import java.util.Properties;
 
-public class subscriberConnectionManager implements Runnable{
-    private subscriberEventManager manager;
-
+public class SubscriberConnectionManager implements Runnable{
+    private PubSubCallback manager;
     private Properties props;
 
-    public subscriberConnectionManager(subscriberEventManager manager){
+    public SubscriberConnectionManager(PubSubCallback manager){
         this.manager = manager;
     }
 
@@ -28,17 +31,22 @@ public class subscriberConnectionManager implements Runnable{
 
             while (true) {
                 socket = serverSocket.accept();
-                manager.newConnection(new ConnectionDetails(socket, "New Connection !"));
+                ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+                System.out.println("Connection from Event Manager");
+                Packet packet;
+                packet = (Packet) inputStream.readObject();
+                PubSubAgent pubSubAgent = new PubSubAgent();
+                pubSubAgent.handleEvent(packet);
             }
 
-        } catch (NumberFormatException | IOException e) {
+        } catch (NumberFormatException | IOException | ClassNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
     private void loadProperties() {
         try {
-            String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+            String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
             String appConfigPath = rootPath + "application.properties";
 
             Properties appProps = new Properties();
@@ -50,5 +58,13 @@ public class subscriberConnectionManager implements Runnable{
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    public PubSubCallback getManager() {
+        return manager;
+    }
+
+    public void setManager(PubSubCallback manager) {
+        this.manager = manager;
     }
 }

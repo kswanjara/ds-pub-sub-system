@@ -17,7 +17,7 @@ public class EventNotifier implements Runnable {
 	private List<Event> event;
 	private List<SubscriberDto> subscribers;
 
-	public EventNotifier(CallBack manager, List<Event> eventList, List<SubscriberDto> subscribers) {
+	EventNotifier(CallBack manager, List<Event> eventList, List<SubscriberDto> subscribers) {
 		this.manager = manager;
 		this.event = eventList;
 		this.subscribers = subscribers;
