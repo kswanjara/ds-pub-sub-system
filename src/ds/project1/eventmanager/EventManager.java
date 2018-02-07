@@ -76,7 +76,7 @@ public class EventManager implements CallBack {
 		List<Event> tempList = new ArrayList<Event>();
 		tempList.add(event);
 		new Thread(new EventNotifier(new EventManager(), tempList, getAllData().getTopicDetails().get(event.getTopic()),
-				getAllData().getSubscriberList())).start();
+				getAllData().getSubscriberList(), "Event")).start();
 	}
 
 	/*
@@ -86,6 +86,20 @@ public class EventManager implements CallBack {
 		Map<Topic, List<SubscriberDto>> map = getAllData().getTopicDetails();
 		map.put(topic, new ArrayList<SubscriberDto>());
 		getAllData().setTopicDetails(map);
+
+		broadcastTopic(topic);
+	}
+
+	private void broadcastTopic(Topic topic) {
+		Event event = new Event();
+		event.setTopic(topic);
+		event.setType(PacketConstants.Topic.toString());
+
+		List<Event> list = new ArrayList<>();
+		list.add(event);
+
+		new Thread(new EventNotifier(new EventManager(), list, getAllData().getSubscriberList(),
+				getAllData().getSubscriberList(), "Topic")).start();
 	}
 
 	/*
@@ -262,6 +276,7 @@ public class EventManager implements CallBack {
 
 	private void addPublisher(AbstractPubSubDto abstractPubSubDto) {
 		// TODO Auto-generated method stub
+		getAllData().getPublisherDto().add((PublisherDto) abstractPubSubDto);
 	}
 
 	private void changeSubscriberStatus(SubscriberDto dto, boolean status) {

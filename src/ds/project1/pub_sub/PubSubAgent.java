@@ -506,13 +506,20 @@ public class PubSubAgent implements PubSubCallback {
 
 	@Override
 	public void handleEvent(Packet packet) {
-		List<Event> eventList = packet.getEventList();
-		if (eventList != null && eventList.size() > 0) {
-			System.out.println("Event Notifications : \n");
-			for (Event event : eventList) {
-				System.out.println("Title : " + event.getTitle());
-				System.out.println("Content : " + event.getContent());
+		if (packet.getType().equalsIgnoreCase("Event")) {
+			List<Event> eventList = packet.getEventList();
+			if (eventList != null && eventList.size() > 0) {
+				System.out.println("Event Notifications :");
+				for (Event event : eventList) {
+					System.out.println("Title : " + event.getTitle());
+					System.out.println("Content : " + event.getContent());
+				}
 			}
+		} else if (packet.getType().equalsIgnoreCase("Topic")) {
+			System.out.println("New topic added : ");
+			System.out.println("Topic Name : " + packet.getEventList().get(0).getTopic().getName());
+			System.out.println("Keywords : " + packet.getEventList().get(0).getTopic().getKeywords());
 		}
+
 	}
 }

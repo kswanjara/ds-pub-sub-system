@@ -10,6 +10,8 @@ public class Event implements Serializable {
 	private String title;
 	private String content;
 
+	private String type = "Event";
+
 	public int getId() {
 		return id;
 	}
@@ -40,5 +42,13 @@ public class Event implements Serializable {
 
 	public void setTopic(Topic topic) {
 		this.topic = topic;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 }
