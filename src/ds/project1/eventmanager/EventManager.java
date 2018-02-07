@@ -90,6 +90,17 @@ public class EventManager implements CallBack {
 		broadcastTopic(topic);
 	}
 
+	/**
+	 * To display all the subscribers
+	 */
+	@Override
+	public void showSubscriberList() {
+		Map<Topic, List<SubscriberDto>> subscriberInfo = getAllData().getTopicDetails();
+		for (Topic t : subscriberInfo.keySet()) {
+			System.out.println(t.getName() + " : " + subscriberInfo.get(t));
+		}
+	}
+
 	private void broadcastTopic(Topic topic) {
 		Event event = new Event();
 		event.setTopic(topic);
@@ -161,6 +172,7 @@ public class EventManager implements CallBack {
 
 	public static void main(String[] args) {
 		EventManager eventManager = new EventManager();
+		new Thread(new EventManagerCommunicator(eventManager)).start();
 		eventManager.startService();
 	}
 

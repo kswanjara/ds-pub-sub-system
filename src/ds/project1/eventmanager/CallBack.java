@@ -15,4 +15,6 @@ public interface CallBack {
 	public List<SubscriberDto> cacheEventForSubscriber(List<Event> events, SubscriberDto subscriberDto);
 
 	public void updateAllSubscribers(List<SubscriberDto> allSubscribers);
+
+	public void showSubscriberList();
 }

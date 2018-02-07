@@ -20,7 +20,7 @@ public class SubscriberDto extends AbstractPubSubDto implements Serializable {
 
 	@Override
 	public String toString() {
-		return "SubscriberDto [selfQueue=" + selfQueue + "]";
+		return "SubscriberDto [ Guid=" + super.getGuid() + "]";
 	}
 
 }
