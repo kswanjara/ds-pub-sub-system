@@ -139,6 +139,7 @@ public class PubSubAgent implements PubSubCallback {
 	private static void notifyEventManager() {
 		Packet packet = new Packet(null, null, PacketConstants.SubscriberDto.toString(), subscriberDto);
 		Packet replyFromServer = connectToEventManager(packet);
+		packet.setType("Event");
 		new PubSubAgent().handleEvent(replyFromServer);
 	}
 
@@ -290,6 +291,7 @@ public class PubSubAgent implements PubSubCallback {
 						packet = new Packet(null, null, PacketConstants.SubscriberDto.toString(), subscriberDto);
 						packet = connectToEventManager(packet);
 						if (packet != null) {
+							packet.setType("Event");
 							handleEvent(packet);
 						}
 						System.out.println("Hi " + subscriberDto.getGuid());
