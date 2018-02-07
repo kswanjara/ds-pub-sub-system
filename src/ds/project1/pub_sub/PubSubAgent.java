@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * Manager.
  */
 public class PubSubAgent implements PubSubCallback {
-	private static SubscriberDto subscriberDto;
+	private static SubscriberDto subscriberDto = new SubscriberDto();
 	private static Socket socket;
 
 	private static Properties props;
@@ -40,7 +40,8 @@ public class PubSubAgent implements PubSubCallback {
 	 * @return Packet object consisting of a topic list
 	 */
 	private static Packet connectToEventManager(Packet packet) {
-		Packet replyFromServer = null;
+		Packet replyFromServer = packet;
+		String type = packet.getType();
 		try {
 			Socket socket = new Socket(props.getProperty("server.ip"),
 					Integer.parseInt(props.getProperty("server.port.number")));
@@ -50,6 +51,12 @@ public class PubSubAgent implements PubSubCallback {
 
 			try {
 				replyFromServer = (Packet) inputStream.readObject();
+				if (replyFromServer.getType().equalsIgnoreCase(PacketConstants.Port.toString())) {
+					props.setProperty("server.port.number", replyFromServer.getPort());
+					replyFromServer.setType(type);
+					replyFromServer = connectToEventManager(replyFromServer);
+				}
+
 			} catch (IOException | ClassNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -132,6 +139,7 @@ public class PubSubAgent implements PubSubCallback {
 	private static void notifyEventManager() {
 		Packet packet = new Packet(null, null, PacketConstants.SubscriberDto.toString(), subscriberDto);
 		Packet replyFromServer = connectToEventManager(packet);
+		new PubSubAgent().handleEvent(replyFromServer);
 	}
 
 	/**
@@ -140,13 +148,25 @@ public class PubSubAgent implements PubSubCallback {
 	 * @throws UnknownHostException
 	 */
 	private static void loadSubscriberDto() throws UnknownHostException {
+		String guid = subscriberDto.getGuid();
 		subscriberDto = new SubscriberDto();
 		subscriberDto.setPort(8881);
 		subscriberDto.setOnline(true);
-		subscriberDto.setGuid("DNS");
-		// subscriberDto.setIp(InetAddress.getLocalHost().getHostAddress().trim());
-		subscriberDto.setIp("172.20.10.9");
-		System.out.println("Ip address is" + InetAddress.getLocalHost().getHostAddress().trim());
+		// subscriberDto.setGuid(guid);
+		subscriberDto.setIp(InetAddress.getLocalHost().getHostAddress().trim());
+		if (!guid.equalsIgnoreCase("")) {
+			guid = subscriberDto.getGuid();
+			subscriberDto.setGuid(guid);
+		} else {
+
+			Scanner sc = new Scanner(System.in);
+			System.out.println("Enter subscriberId : ");
+			guid = sc.next();
+			subscriberDto.setGuid(guid);
+		}
+		// subscriberDto.setIp("localhost");
+		// System.out.println("Ip address is" +
+		// InetAddress.getLocalHost().getHostAddress().trim());
 	}
 
 	private static void listenToEventManager() {
@@ -184,7 +204,7 @@ public class PubSubAgent implements PubSubCallback {
 					+ "Press 2 for subscribing directly to a topic using it's name \n"
 					+ "Press 3 to unsubscribe from a topic \n" + "Press 4 to show all the topics \n"
 					+ "Press 5 to unsubscribe from all the topics that you have subscribed for \n"
-					+ "Press 6 to quit \n");
+					+ "Press 6 to Go offline! \n");
 			Scanner sc = new Scanner(System.in);
 			label: while (sc.hasNextInt()) {
 				switch (sc.nextInt()) {
@@ -196,7 +216,7 @@ public class PubSubAgent implements PubSubCallback {
 					keywords = sc.next();
 					if (keywords != null) {
 						List<String> items = Arrays.asList(keywords.split("\\s*,\\s*"));
-						System.out.println(items);
+						// System.out.println(items);
 						subscribe(items);
 					}
 
@@ -253,11 +273,32 @@ public class PubSubAgent implements PubSubCallback {
 					break label;
 
 				case 6:
-					SubscriberDto subscriberDto1 = new SubscriberDto();
-					subscriberDto1.setOnline(false);
-					Packet packet = new Packet(null, null, PacketConstants.SubscriberDto.toString(), subscriberDto1);
-					done = true;
-					System.out.println("Bye Bye Subscriber...");
+					subscriberDto.setOnline(false);
+					Packet packet = new Packet(null, null, PacketConstants.SubscriberDto.toString(), subscriberDto);
+					packet = connectToEventManager(packet);
+					if (packet != null) {
+						done = true;
+						subscriberDto.setOnline(true);
+						System.out.println("Bye Bye Subscriber...");
+					} else {
+						System.out.println("Please try again after sometime!");
+					}
+
+					System.out.println("You are offline now. Go online(y) Exit(n) ?");
+					String choice = sc.next();
+					if (choice.equalsIgnoreCase("y")) {
+						packet = new Packet(null, null, PacketConstants.SubscriberDto.toString(), subscriberDto);
+						packet = connectToEventManager(packet);
+						if (packet != null) {
+							handleEvent(packet);
+						}
+						System.out.println("Hi " + subscriberDto.getGuid());
+						done = false;
+						break label;
+					} else {
+						System.out.println("Exiting...");
+						System.exit(0);
+					}
 					break label;
 
 				default:
@@ -356,7 +397,7 @@ public class PubSubAgent implements PubSubCallback {
 			return allSubscribedTopicList;
 		} else {
 			System.out.println("You are not subscribed to any topics yet. \n Please subscribe to some topics first.");
-			return listSubscribedTopics();
+			return allSubscribedTopicList;
 		}
 	}
 
@@ -381,17 +422,20 @@ public class PubSubAgent implements PubSubCallback {
 		String selected_topic = pub_helper_sc.next();
 		Topic object_of_selected_topic = null;
 		for (Topic item : list_of_objects_of_topics.getTopicList()) {
-			if (item.getName().equals(selected_topic)) {
+			if (item.getName().equalsIgnoreCase(selected_topic)) {
 				object_of_selected_topic = item;
 			}
 		}
 		E.setTopic(object_of_selected_topic);
 
 		System.out.println("Enter the title of article");
-		E.setTitle(pub_helper_sc.next());
-
+		pub_helper_sc.nextLine();
+		E.setTitle(pub_helper_sc.nextLine());
+		// pub_helper_sc.next();
 		System.out.println("Enter the content you would like to publish");
-		E.setContent(pub_helper_sc.next());
+		// pub_helper_sc.nextLine();
+		E.setContent(pub_helper_sc.nextLine());
+		// pub_helper_sc.hasNext();
 		pubAgent.publish(E);
 	}
 
@@ -410,7 +454,7 @@ public class PubSubAgent implements PubSubCallback {
 		Packet packet_from_publisher = new Packet();
 		packet_from_publisher.setTopic(event.getTopic());
 		packet_from_publisher.setEvent((event));
-		packet_from_publisher.setType(PacketConstants.PublisherDto.toString());
+		packet_from_publisher.setType(PacketConstants.Event.toString());
 		packet_from_publisher.setAbstractPubSubDto(publisherDto);
 		response_from_server_to_publisher = connectToEventManager((packet_from_publisher));
 	}
@@ -448,10 +492,10 @@ public class PubSubAgent implements PubSubCallback {
 		topic_name = sc.next();
 		Topic T = new Topic();
 		T.setName(topic_name);
-		System.out.println("Enter the related keywords");
+		System.out.println("Enter the related keywords: ( enter done when done )");
 		do {
 			keyword = sc.next();
-			if (keyword.equals("done"))
+			if (keyword.equalsIgnoreCase("done"))
 				break;
 			else
 				temp_list.add(keyword);

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,18 @@ import ds.project1.eventmanager.dto.SubscriberDto;
 public class EventManager implements CallBack {
 
 	private static DataManagerDto allData = new DataManagerDto();
+
+	private Properties props;
+
+	private void loadProperties() {
+		try {
+			props = new Properties();
+			props.load(ConnectionManager.class.getClassLoader().getResourceAsStream("application.properties"));
+		} catch (IOException e) {
+			System.err.println("ConnectionManagerThread: Exception occured: " + e.getMessage());
+			// e.printStackTrace();
+		}
+	}
 
 	@Override
 	public void newConnection(ConnectionDetails connectionDetails) {
@@ -45,8 +58,15 @@ public class EventManager implements CallBack {
 	 * Start the repo service
 	 */
 	private void startService() {
+		loadProperties();
+		String[] ports = this.props.getProperty("server.multi.ports").split(",");
+		for (String string : ports) {
+			Thread requestListeningThread = new Thread(new RequestListeningThread(new EventManager(), string));
+			requestListeningThread.start();
+		}
 		Thread connectionThread = new Thread(new ConnectionManager(new EventManager()));
 		connectionThread.start();
+
 	}
 
 	/*
@@ -158,7 +178,9 @@ public class EventManager implements CallBack {
 					changeSubscriberStatus((SubscriberDto) packet.getAbstractPubSubDto(), true);
 				}
 
-				if (packet.getType().trim().equals(PacketConstants.Topic.toString())) {
+				if (packet.getType().trim().equals(PacketConstants.NewGuid.toString())) {
+					packet = checkIfAcceptable(packet);
+				} else if (packet.getType().trim().equals(PacketConstants.Topic.toString())) {
 					// check what is the type of object in abstractPubSubDto
 					if (packet.getAbstractPubSubDto() != null
 							&& packet.getAbstractPubSubDto() instanceof PublisherDto) {
@@ -194,6 +216,19 @@ public class EventManager implements CallBack {
 					packet.setTopicList(list);
 				}
 			}
+		}
+		return packet;
+	}
+
+	private Packet checkIfAcceptable(Packet packet) {
+		List<SubscriberDto> list = getAllData().getSubscriberList().stream()
+				.filter(p -> p.getGuid().equalsIgnoreCase(packet.getAbstractPubSubDto().getGuid()))
+				.collect(Collectors.toList());
+		if (list != null && list.size() > 0) {
+			packet.setAcceptableGuid(false);
+
+		} else {
+			packet.setAcceptableGuid(true);
 		}
 		return packet;
 	}
@@ -243,7 +278,7 @@ public class EventManager implements CallBack {
 	}
 
 	@Override
-	public void cacheEventForSubscriber(List<Event> events, SubscriberDto dto) {
+	public List<SubscriberDto> cacheEventForSubscriber(List<Event> events, SubscriberDto dto) {
 		if (getAllData().getSubscriberList().contains(dto)) {
 			List<SubscriberDto> list = getAllData().getSubscriberList().stream()
 					.filter(p -> p.getGuid().equals(dto.getGuid())).collect(Collectors.toList());
@@ -258,11 +293,14 @@ public class EventManager implements CallBack {
 				getAllData().getSubscriberList().add(existingDto);
 			}
 		}
+
+		return getAllData().getSubscriberList();
 	}
 
 	@Override
 	public void updateAllSubscribers(List<SubscriberDto> allSubscribers) {
 		// TODO Auto-generated method stub
+		System.out.println("");
 		getAllData().setSubscriberList(allSubscribers);
 	}
 

@@ -6,8 +6,8 @@ import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 import ds.project1.commondtos.Event;
@@ -22,12 +22,31 @@ public class EventNotifier implements Runnable {
 	private List<SubscriberDto> subscribers;
 	private List<SubscriberDto> allSubscribers;
 
+	/**
+	 * @param subscribers
+	 *            the subscribers to set
+	 */
+	public void setSubscribers(List<SubscriberDto> subscribers) {
+		this.subscribers = subscribers;
+	}
+
+	/**
+	 * @param allSubscribers
+	 *            the allSubscribers to set
+	 */
+	public void setAllSubscribers(List<SubscriberDto> allSubscribers) {
+		this.allSubscribers = allSubscribers;
+	}
+
 	public EventNotifier(CallBack manager, List<Event> eventList, List<SubscriberDto> subscribers,
 			List<SubscriberDto> allSubscribers) {
 		this.manager = manager;
 		this.event = eventList;
-		this.subscribers = subscribers;
 		this.allSubscribers = allSubscribers;
+		List<SubscriberDto> tempSubscribers = new ArrayList<>();
+		if (subscribers != null)
+			tempSubscribers.addAll(subscribers);
+		this.subscribers = tempSubscribers;
 	}
 
 	@Override
@@ -37,6 +56,8 @@ public class EventNotifier implements Runnable {
 
 	public void notityUser() {
 		SubscriberDto dto = null;
+
+		Queue<Event> tempQueue = new ArrayDeque<>();
 		try {
 			Packet packet = new Packet(null, null, PacketConstants.Event.toString(), null);
 			for (SubscriberDto subscriberDto : this.subscribers) {
@@ -51,6 +72,8 @@ public class EventNotifier implements Runnable {
 						allSubscribers.remove(subscriberDto);
 
 						Event temp[] = {};
+						tempQueue = subscriberDto.getSelfQueue();
+
 						List<Event> eventList = Arrays.asList(subscriberDto.getSelfQueue().toArray(temp));
 						event.addAll(eventList);
 						packet.setEventList(event);
@@ -65,7 +88,7 @@ public class EventNotifier implements Runnable {
 						outputStream.close();
 						socket.close();
 					} else {
-						manager.cacheEventForSubscriber(event, subscriberDto);
+						this.allSubscribers = manager.cacheEventForSubscriber(event, subscriberDto);
 					}
 				}
 			}
@@ -73,7 +96,8 @@ public class EventNotifier implements Runnable {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			if (dto != null) {
-				manager.cacheEventForSubscriber(event, dto);
+				dto.setSelfQueue(tempQueue);
+				this.allSubscribers = manager.cacheEventForSubscriber(event, dto);
 				System.out.println("Following exception occured. Cached the event for subscriber.");
 				this.subscribers.remove(dto);
 			}

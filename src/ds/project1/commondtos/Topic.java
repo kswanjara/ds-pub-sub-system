@@ -40,7 +40,9 @@ public class Topic implements Serializable {
 		this.keywords = keywords;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -51,7 +53,9 @@ public class Topic implements Serializable {
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -65,7 +69,8 @@ public class Topic implements Serializable {
 		Topic other = (Topic) obj;
 		if (name == null) {
 			return other.name == null;
-		} else return name.equals(other.name);
+		} else
+			return name.equalsIgnoreCase(other.name);
 	}
 
 	@Override

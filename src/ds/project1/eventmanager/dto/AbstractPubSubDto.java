@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class AbstractPubSubDto implements Serializable {
 	private static final long serialVersionUID = 306233517218167600L;
 
-	private String guid;
+	private String guid = "";
 	private String ip;
 	private int port;
 	private boolean online;

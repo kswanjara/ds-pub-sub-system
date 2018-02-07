@@ -2,9 +2,14 @@
 package ds.project1.eventmanager;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
+
+import ds.project1.commondtos.Packet;
+import ds.project1.ds.project1.common.enums.PacketConstants;
 
 public class ConnectionManager implements Runnable {
 
@@ -28,12 +33,20 @@ public class ConnectionManager implements Runnable {
 			while (true) {
 				System.out.println("ConnectionManagerThread: Ready to accept the connections !");
 				socket = serverSocket.accept();
-				System.out.println("ConnectionManagerThread: Got the connect request !");
-				Thread t = new Thread(new EventManagerHelper(manager, socket));
-				t.start();
+				ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+				ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+				Packet packet = (Packet) inputStream.readObject();
+				String[] ports = props.getProperty("server.multi.ports").split(",");
+				String port = ports[(int) (Math.random() * ports.length)];
+				packet.setType(PacketConstants.Port.toString());
+				packet.setPort(port);
+				System.out.println("ConnectionManagerThread: Forwarded to port : " + port);
+				outputStream.writeObject(packet);
+				// Thread t = new Thread(new EventManagerHelper(manager, socket));
+				// t.start();
 			}
 
-		} catch (NumberFormatException | IOException e) {
+		} catch (NumberFormatException | IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			System.err.println("ConnectionManagerThread: Exception occured: " + e.getMessage());
 			// e.printStackTrace();

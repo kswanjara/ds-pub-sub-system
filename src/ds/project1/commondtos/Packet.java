@@ -15,6 +15,8 @@ public class Packet implements Serializable {
 	private AbstractPubSubDto abstractPubSubDto;
 	private List<Topic> TopicList;
 	private List<Event> eventList;
+	private String port;
+	private boolean acceptableGuid = false;
 
 	public List<Topic> getTopicList() {
 		return TopicList;
@@ -73,5 +75,21 @@ public class Packet implements Serializable {
 
 	public void setEventList(List<Event> eventList) {
 		this.eventList = eventList;
+	}
+
+	public String getPort() {
+		return port;
+	}
+
+	public void setPort(String port) {
+		this.port = port;
+	}
+
+	public boolean isAcceptableGuid() {
+		return acceptableGuid;
+	}
+
+	public void setAcceptableGuid(boolean acceptableGuid) {
+		this.acceptableGuid = acceptableGuid;
 	}
 }
