@@ -141,6 +141,8 @@ public class EventManager implements CallBack {
 					Event temp[] = {};
 					List<Event> eventList = Arrays.asList(existingDto.getSelfQueue().toArray(temp));
 					packet.setEventList(eventList);
+					new Thread(new EventNotifier(new EventManager(), eventList, list, getAllData().getSubscriberList(),
+							"Event")).start();
 					// new Thread(new EventNotifier(new EventManager(), eventList, list)).start();
 					existingDto.setSelfQueue(new ArrayDeque<Event>());
 				}
