@@ -105,11 +105,20 @@ public class PubSubAgent implements PubSubCallback {
 		Scanner sc = new Scanner(System.in);
 		boolean done = false;
 		while (!(done)) {
-			System.out.println("What am I? \n1. Publisher 2. Subscriber 3. Advertise 0. Quit");
+			System.out.println("What am I? \n1. Publisher 2. Subscriber 0. Quit");
 			int ch = sc.nextInt();
 			switch (ch) {
 			case 1:
-				publish_helper();
+				System.out.println("What am I? \n1. Publisher 2. Advertiser");
+				int chPub=sc.nextInt();
+				switch (chPub) {
+					case 1:
+						publish_helper();
+						break;
+					case 2:
+						advertise_helper();
+						break;
+				}
 				break;
 			case 2:
 				// connectToEventManager("Subscriber");
@@ -122,9 +131,6 @@ public class PubSubAgent implements PubSubCallback {
 				}
 				notifyEventManager();
 				pubSubAgent.subscribe_helper();
-				break;
-			case 3:
-				advertise_helper();
 				break;
 			case 0:
 				done = true;
