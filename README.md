@@ -1,0 +1,1 @@
+Engineered a durable and persistent peer-to-peer Publish-subscribe messaging queue paradigm using socket programming in Java. Implemented and tested for QA on Docker by creating a docker image and multiple containers.
